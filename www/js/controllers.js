@@ -81,6 +81,7 @@ angular.module('openit.controllers', [])
   }
 })
 
-.controller('PlaylistCtrl', function($scope, $stateParams) {
-
+.controller('PlaylistCtrl', function($scope, $stateParams ) {
+  var id = $stateParams.id;
+  $scope.id = id;
 });

@@ -58,7 +58,7 @@ angular.module('openit', ['ionic', 'openit.controllers'] )
     })
 
     .state('app.single', {
-      url: "/playlists/:playlistId",
+      url: "/playlists/:id",
       views: {
         'menuContent' :{
           templateUrl: "templates/playlist.html",

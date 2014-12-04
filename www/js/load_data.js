@@ -172,22 +172,20 @@ function getProductList( xmldata )
 	return list;
 }
 
-function getFeatureList()
+function getFeatureList( xmldata , filter )
 {
-	if (XMLDoc == undefined )
+	if (xmldata == undefined )
 	{
 		VERBOSE( "load_data-loadFeatures: XMLDoc is null " );
 		return;
 	}
 	
-	DEBUG("Got filter '" + CurrentFilters + "'" );
 	
-	var filter = CurrentFilters.split('|');
 	
-	var vendorlicenses = XMLDoc.getElementsByTagName( "vendorlicense" );
+	var vendorlicenses = xmldata.getElementsByTagName( "vendorlicense" );
 	
 	// Filter product name
-	if ( filter[1] != 'all' )
+	if ( filter != 'all' )
 	{
 		for( i=0; i < vendorlicenses.length; ++i )
 		{

@@ -24,7 +24,7 @@
   
 
     <ion-list>
-      <ion-item ng-repeat="product in productlist  | orderBy:'productname' | filter:search" href="#/app/playlists/#{{product.id}}" class="license_info">
+      <ion-item ng-repeat="product in productlist  | orderBy:'productname' | filter:search" href="#/app/playlists/:{{product.id}}" class="license_info">
         <h3>{{product.productname}}</h3>
         <br/><br/>
         <p>Total Licenses: {{product.totallicenses}}</p>
@@ -35,4 +35,3 @@
     <br/><br/>
   </ion-content>
 </ion-view>
-
