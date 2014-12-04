@@ -57,20 +57,31 @@ angular.module('openit.controllers', [])
 
 .controller('PlaylistsCtrl', function($scope , $http ) {
   
-  $scope.productlist = [];
+  
 
-  VERBOSE("Updating Productlist...");
-  $http.get('http://devcola.com/public_data/loadxml.php').then( function (resp){
-    VERBOSE( 'Success' , resp );
-    var xmldoc = parseXML( resp.data );
-    $scope.productlist = getLicenseStatus(xmldoc);
-  }, function( err ) {
-    showError(' Error' ,err );
-  });
+  if ( License_status.length == 0 )
+  {
+    VERBOSE("Updating Productlist...");
+    var dataurl = getServerUrl();
+    VERBOSE("Retrieving data from " + dataurl );
+    $http.get( dataurl ).then( function (resp){
+      VERBOSE( 'Success' , resp );
+      var xmldoc = parseXML( resp.data );
+      $scope.productlist = getLicenseStatus(xmldoc);
+    }, function( err ) {
+      showError(' Error' ,err );
+    });
+
+  }
+  
+
+  $scope.productlist = License_status;
 
   $scope.productListRefresh = function(){
     VERBOSE("Refreshing xml data");
-    $http.get('http://devcola.com/public_data/loadxml.php').then( function (resp){
+    var dataurl = getServerUrl();
+    VERBOSE("Retrieving data from " + dataurl );
+    $http.get( dataurl).then( function (resp){
       VERBOSE( 'Success' , resp );
       var xmldoc = parseXML( resp.data );
       $scope.productlist = getLicenseStatus(xmldoc);
@@ -86,7 +97,9 @@ angular.module('openit.controllers', [])
 
    $scope.refreshXMLData = function(){
     VERBOSE("Refreshing xml data");
-    $http.get('http://devcola.com/public_data/loadxml.php').then( function (resp){
+    var dataurl = getServerUrl();
+     VERBOSE("Retrieving data from " + dataurl );
+    $http.get( dataurl ).then( function (resp){
       VERBOSE( 'Success' , resp );
       var xmldoc = parseXML( resp.data );
       License_status = getLicenseStatus(xmldoc);

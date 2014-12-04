@@ -2,6 +2,11 @@ var ServerUrl = "http://devcola.com/public_data/loadxml.php";
 //var ServerUrl ="http://mnl242lin:8080/OpeniT/loadxml.php";
 var License_status = [];
 
+function getServerUrl ()
+{
+	var randomNum = Math.round(Math.random() * 10000);
+	return ServerUrl + "?rand=" + randomNum;
+}
 
 /*return epoch time(milliseconds) to string readable*/
 function epochToDate( epoch ) 
