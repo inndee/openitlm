@@ -82,6 +82,7 @@ angular.module('openit.controllers', [])
 })
 
 .controller('PlaylistCtrl', function($scope, $stateParams ) {
-  var id = $stateParams.id;
+  var id = $stateParams.id.substring(1);
   $scope.id = id;
+  $scope.category = $stateParams.category.substring(1);
 });
