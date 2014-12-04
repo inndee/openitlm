@@ -1,8 +1,27 @@
 <ion-view title="{{category}}">
 	<div class="bar bar-subheader">
-	  <h2 class="title">{{id}}</h2>
+	  <h2 class="title">{{productname}}</h2>
 	</div>
   <ion-content class="has-header">
-    
+
+  <ion-refresher
+      pulling-text="Pull to refresh"
+      on-refresh="refreshXMLData()">
+    </ion-refresher>
+
+  <br/><br/>
+    <ion-list>
+      <ion-item ng-repeat="feature in features" href="#/app/playlists/:Features/:{{product.id}}" class="license_info">
+        <h3>{{feature.name}}</h3>
+        <br/><br/>
+        <p>Licenses: {{feature.licenses}}</p>
+        <p>Used: {{feature.used}}</p>
+        <br/>
+ 		<p>Version: {{feature.version}}</p>
+ 		<p>Expires: {{feature.expires}}</p>
+ 		
+        <div class="meterbar"><hr align="left" width="{{feature.percentage}}%" style="visibility:{{feature.bar_visibility}}"></div>
+      </ion-item>
+    </ion-list>
   </ion-content>
 </ion-view>

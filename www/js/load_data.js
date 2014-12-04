@@ -1,65 +1,6 @@
 var ServerUrl = "http://devcola.com/public_data/loadxml.php";
 //var ServerUrl ="http://mnl242lin:8080/OpeniT/loadxml.php";
-var CurrentFilters = "product|all";
-var LastFilter = undefined;
-var XMLDoc;
-
-
-function getCurrentFilter()
-{
-	return CurrentFilters;
-}
-function useLastFilter()
-{
-	var temp = CurrentFilters;
-	CurrentFilters = LastFilter;
-	LastFilter = temp;
-}
-function setFilter( filter )
-{
-	LastFilter = CurrentFilters;
-	CurrentFilters = filter;
-}
-function loadItems()
-{
-	if ( CurrentFilters == undefined )
-	{
-		WARNING("No current Filter defined. Setting to default");
-		CurrentFilters = "product:all";
-	}
-	
-	var filter = CurrentFilters.split('|');
-	var list={};
-	if ( filter[0] == "product" )
-		list = getProductList();
-	else if ( filter[0] =="feature")
-		list = getFeatureList();
-	else if ( filter[0] =="users")
-		list = getUsersOfFeature();
-		
-	return list;	
-}
-
-var AppMessage = ({
-	
-	showMeh: function( message_title ,  message )
-	{
-		var meh = "<br/><br/><br/><i class=\"fa fa-exclamation-triangle  fa-5x\" style=\"color:#0099FF;\"></i><br> \
-		<p style=\"color:#0099FF;padding:10px;\">" + message +"</p>";
-		var itemslist = document.getElementById("message");
-		var page_title = document.getElementById("page_title");
-		var dummy = document.getElementById("license_list");
-		itemslist.innerHTML = meh;
-		page_title.innerHTML = message_title;
-		dummy.innerHTML = "";
-	},
-	hideMeh: function()
-	{
-		var itemslist = document.getElementById( "message" ).innerHTML = "";
-	}
-
-});
-
+var License_status = [];
 
 
 /*return epoch time(milliseconds) to string readable*/
@@ -81,25 +22,6 @@ function epochToDate( epoch )
 
 function capitaliseFirstLetter(string){ return string.charAt(0).toUpperCase() + string.slice(1); }
 
-function testConnection( url )
-{
-    var xhr = new XMLHttpRequest();
-    var file = url ;
-    var randomNum = Math.round(Math.random() * 10000);
-    xhr.open('HEAD', file + "?rand=" + randomNum, false);
-     
-    try {
-        xhr.send();
-         
-        if (xhr.status >= 200 && xhr.status < 304) {
-            return true;
-        } else {
-            return false;
-        }
-    } catch (e) {
-        return false;
-    }
-}
 function parseXML( xml_string )
 {
 	var xmldoc;
@@ -121,7 +43,7 @@ function parseXML( xml_string )
 /*Load list of products
 use 'all' for no filter
 */
-function getProductList( xmldata )
+function getLicenseStatus( xmldata )
 {
 	if (xmldata == undefined )
 	{
@@ -138,9 +60,48 @@ function getProductList( xmldata )
 	for ( i=0; i < vendorlicenses.length; ++i )
 	{
 	
-
+		var featureslist = [];
 		var features = vendorlicenses[i].getElementsByTagName( "feature" );
 		
+		//get list of features under this product
+		for ( counter = 0; counter < features.length; ++counter)
+		{
+			var expires = features[counter].getAttribute("expires") ;
+			expires = epochToDate ( expires );
+			var used = features[counter].getAttribute("used");
+			var licenses = features[counter].getAttribute("licenses");
+			var percentage = parseInt( (used/licenses) * 100 );
+			var visible = "hidden";
+			if ( percentage != 0 )
+				visible = "visible";
+			
+
+			var online = features[counter].getElementsByTagName("online");
+			var entries = online[0].getElementsByTagName("entry");
+			
+			//get all users
+			var userslist = [];
+			for ( entry_id = 0; entry_id != entries.length; ++entry_id )
+			{
+				
+				userslist.push( { user: entries[entry_id].getElementsByTagName("user")[0].innerHTML,
+							display: entries[entry_id].getElementsByTagName("display")[0].innerHTML,
+							host: entries[entry_id].getElementsByTagName("host")[0].innerHTML,
+							count: entries[entry_id].getElementsByTagName("count")[0].innerHTML });
+			}
+
+			featureslist.push({ id	: i,
+					name 			: features[counter].getAttribute("name") ,
+					productname		: vendorlicenses[i].getAttribute("name")  ,
+					version			: features[counter].getAttribute("version") ,
+					expires			: expires,
+					licenses		: features[counter].getAttribute("licenses") ,
+					used 			: used ,
+					users 			: userslist, 		
+					percentage		: percentage,
+					bar_visibility  : visible });
+		} 
+
 		var totallicenses = 0;
 		var inuse = 0;
 		
@@ -162,13 +123,14 @@ function getProductList( xmldata )
 					productname 	: vendorlicenses[i].getAttribute("name")  ,
 					client			: vendorlicenses[i].getAttribute("client"),
 					type			: vendorlicenses[i].getAttribute("type") ,
-					features		: vendorlicenses[i].getElementsByTagName( "feature" ),
+					features		: featureslist,
 					totallicenses	: totallicenses ,
 					inuse 			: inuse,
 					unused 			: parseInt( totallicenses - inuse ),
 					percentage		: percentage,
 					bar_visibility  : visible });
 	}
+	License_status = list;
 	return list;
 }
 
@@ -320,9 +282,6 @@ function getUsersOfFeature()
 	list.push({online : online_list } );
 	return list;
 }
-
-
-
 
 
 

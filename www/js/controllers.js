@@ -1,5 +1,6 @@
 angular.module('openit.controllers', [])
 
+
 .controller('AppCtrl', function($scope, $ionicModal, $timeout) {
   // Form data for the login modal
   $scope.loginData = {};
@@ -62,7 +63,7 @@ angular.module('openit.controllers', [])
   $http.get('http://devcola.com/public_data/loadxml.php').then( function (resp){
     VERBOSE( 'Success' , resp );
     var xmldoc = parseXML( resp.data );
-    $scope.productlist = getProductList(xmldoc);
+    $scope.productlist = getLicenseStatus(xmldoc);
   }, function( err ) {
     showError(' Error' ,err );
   });
@@ -72,7 +73,7 @@ angular.module('openit.controllers', [])
     $http.get('http://devcola.com/public_data/loadxml.php').then( function (resp){
       VERBOSE( 'Success' , resp );
       var xmldoc = parseXML( resp.data );
-      $scope.productlist = getProductList(xmldoc);
+      $scope.productlist = getLicenseStatus(xmldoc);
       $scope.$broadcast('scroll.refreshComplete');
     }, function( err ) {
       showError(' Error' ,err );
@@ -81,8 +82,25 @@ angular.module('openit.controllers', [])
   }
 })
 
-.controller('PlaylistCtrl', function($scope, $stateParams ) {
+.controller('PlaylistCtrl', function($scope, $stateParams , $http ) {
+
+   $scope.refreshXMLData = function(){
+    VERBOSE("Refreshing xml data");
+    $http.get('http://devcola.com/public_data/loadxml.php').then( function (resp){
+      VERBOSE( 'Success' , resp );
+      var xmldoc = parseXML( resp.data );
+      License_status = getLicenseStatus(xmldoc);
+      $scope.$broadcast('scroll.refreshComplete');
+    }, function( err ) {
+      showError(' Error' ,err );
+
+    })
+  }
+  
   var id = $stateParams.id.substring(1);
   $scope.id = id;
   $scope.category = $stateParams.category.substring(1);
+  $scope.productname = License_status[$scope.id].productname;
+  $scope.features = License_status[$scope.id].features; 
+
 });
