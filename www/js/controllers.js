@@ -67,7 +67,7 @@ angular.module('openit.controllers', [])
       VERBOSE( 'Success' , resp );
       var xmldoc = parseXML( resp.data );
       parseLicenseStatus(xmldoc);
-      setListing();
+      prepareListing();
     }, function( err ) {
       ERROR('Failed to retrieved data');
     });
@@ -75,27 +75,27 @@ angular.module('openit.controllers', [])
   
   $scope.category = capitaliseFirstLetter( $stateParams.category.substring(1) );
   var id = $stateParams.id.substring(1);
-  setListing();
+  prepareListing();
   
   /*Functions goes here*/
 
-  function setListing (){
-  var features = [];
-  
-  if ( $scope.category.toLowerCase() == 'products')
-    $scope.listing = License_status;
-  else if ( $scope.category.toLowerCase() == 'features')
-  {
-    for (i =0; i !=License_status.length; i++)
-    {
-        License_status[i].features.forEach(function( entry ){
-          features.push( entry );
-        });  
-    }
-    $scope.listing = features;
+  function prepareListing (){
+      var features = [];
+      
+      if ( $scope.category.toLowerCase() == 'products')
+        $scope.listing = License_status;
+      else if ( $scope.category.toLowerCase() == 'features')
+      {
+        for (i =0; i !=License_status.length; i++)
+        {
+            License_status[i].features.forEach(function( entry ){
+              features.push( entry );
+            });  
+        }
+        $scope.listing = features;
+      }
+    
   }
-  
-}
   /*scope functions here*/
   $scope.productListRefresh = function(){
     VERBOSE("Refreshing xml data via list drag");
@@ -105,7 +105,7 @@ angular.module('openit.controllers', [])
       VERBOSE( 'Success' , resp );
       var xmldoc = parseXML( resp.data );
       parseLicenseStatus(xmldoc);
-      setListing();
+      prepareListing();
       $scope.$broadcast('scroll.refreshComplete');
     }, function( err ) {
       showError(' Error' ,err );

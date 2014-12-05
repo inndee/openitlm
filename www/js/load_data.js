@@ -50,13 +50,14 @@ use 'all' for no filter
 */
 function parseLicenseStatus( xmldata )
 {
+	
 	if (xmldata == undefined )
 	{
 		ERROR( "XMLDoc is null" );
 		return;
 	}
 		
-	
+	VERBOSE("parsing License status data");
 	var vendorlicenses = xmldata.getElementsByTagName( "vendorlicense" );
 	
 	//create list of products
@@ -76,9 +77,27 @@ function parseLicenseStatus( xmldata )
 			var used = features[counter].getAttribute("used");
 			var licenses = features[counter].getAttribute("licenses");
 			var percentage = parseInt( (used/licenses) * 100 );
+			
 			var visible = "hidden";
+			var usage_meter = "";
 			if ( percentage != 0 )
+			{
 				visible = "visible";
+				usage_meter = "<hr align='left' width='" + percentage + "%' />"; 
+			}
+				
+				
+			var details = "<p>Product:  <b>" + vendorlicenses[i].getAttribute("name")  +"</b></p>" +
+						  "<p>Licenses: <b>" + licenses + "</b></p>" +
+						  "<p>In Use  : <b>" + used 	 + "</b></p><br/>" +
+						  "<p>Expires : <b>" + expires  + "</b></p>";
+			
+			details += "<br/><br/><div class='meterbar'>" + 
+						usage_meter +
+					   "</div>";
+
+
+
 			
 
 			var online = features[counter].getElementsByTagName("online");
@@ -89,10 +108,12 @@ function parseLicenseStatus( xmldata )
 			for ( entry_id = 0; entry_id != entries.length; ++entry_id )
 			{
 				
-				userslist.push( { user: entries[entry_id].getElementsByTagName("user")[0].innerHTML,
+				userslist.push({ 
+							user: entries[entry_id].getElementsByTagName("user")[0].innerHTML,
 							display: entries[entry_id].getElementsByTagName("display")[0].innerHTML,
 							host: entries[entry_id].getElementsByTagName("host")[0].innerHTML,
-							count: entries[entry_id].getElementsByTagName("count")[0].innerHTML });
+							count: entries[entry_id].getElementsByTagName("count")[0].innerHTML 
+						});
 			}
 
 			featureslist.push({ id	: i,
@@ -104,7 +125,8 @@ function parseLicenseStatus( xmldata )
 					used 			: used ,
 					users 			: userslist, 		
 					percentage		: percentage,
-					bar_visibility  : visible });
+					bar_visibility  : visible,
+					detailshtml 	: details  });
 		} 
 
 		var totallicenses = 0;
@@ -119,22 +141,42 @@ function parseLicenseStatus( xmldata )
 		var percentage = parseInt( (inuse/totallicenses) * 100 );
 		
 		var visible = "hidden";
+		var usage_meter = "";
 		if ( percentage != 0 )
+		{
 			visible = "visible";
-		
-		
+			usage_meter = "<hr align='left' width='" + percentage + "%' />"; 
+		}
 			
+			
+		var details = "<p>Total Licenses:<b> " + totallicenses + "</b></p>" +
+					  "<p>In Use Licenses:<b> " + inuse + "</b></p>";
+		
+		details += "<br/><br/><div class='meterbar'>" + 
+					usage_meter +
+				   "</div>";
+		
+		var license = vendorlicenses[i].getElementsByTagName("licensefile")[0];
+
+		if ( license != undefined )
+			license = license.innerHTML;
+
+		
 		list.push({ id				: i,
 					item_name 		: vendorlicenses[i].getAttribute("name")  ,
 					client			: vendorlicenses[i].getAttribute("client"),
 					type			: vendorlicenses[i].getAttribute("type") ,
+					licensefile 	: license,
 					features		: featureslist,
 					totallicenses	: totallicenses ,
 					inuse 			: inuse,
 					unused 			: parseInt( totallicenses - inuse ),
 					percentage		: percentage,
-					bar_visibility  : visible });
+					bar_visibility  : visible ,
+					detailshtml		: details
+				});
 	}
+	DEBUG("Got '" + list.length + "' products");
 	License_status = list;
 	return list;
 }
@@ -288,5 +330,11 @@ function getUsersOfFeature()
 	return list;
 }
 
+
+function getMeterBarHtml()
+{
+
+
+}
 
 

@@ -25,9 +25,9 @@
 
         <h3>{{item.item_name}}</h3>
         <br/><br/>
-        <p>Total Licenses: {{item.totallicenses}}</p>
-        <p>In use licenses: {{item.inuse}}</p>
-        <div class="meterbar"><hr align="left" width="{{item.percentage}}%" style="visibility:{{item.bar_visibility}}"></div>
+        <div ng-bind-html="item.detailshtml"></div>
+
+        
       </ion-item>
     </ion-list>
     <br/><br/>
