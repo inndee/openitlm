@@ -48,7 +48,7 @@ function parseXML( xml_string )
 /*Load list of products
 use 'all' for no filter
 */
-function getLicenseStatus( xmldata )
+function parseLicenseStatus( xmldata )
 {
 	if (xmldata == undefined )
 	{
@@ -96,7 +96,7 @@ function getLicenseStatus( xmldata )
 			}
 
 			featureslist.push({ id	: i,
-					name 			: features[counter].getAttribute("name") ,
+					item_name 		: features[counter].getAttribute("name") ,
 					productname		: vendorlicenses[i].getAttribute("name")  ,
 					version			: features[counter].getAttribute("version") ,
 					expires			: expires,
@@ -125,7 +125,7 @@ function getLicenseStatus( xmldata )
 		
 			
 		list.push({ id				: i,
-					productname 	: vendorlicenses[i].getAttribute("name")  ,
+					item_name 		: vendorlicenses[i].getAttribute("name")  ,
 					client			: vendorlicenses[i].getAttribute("client"),
 					type			: vendorlicenses[i].getAttribute("type") ,
 					features		: featureslist,

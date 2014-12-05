@@ -1,0 +1,35 @@
+<ion-view title="{{category}}">
+  <ion-nav-buttons side="left">
+    <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+  </ion-nav-buttons>
+
+
+  <div class="bar bar-footer bar-calm">
+
+    <label class="item item-input">
+        <i class="icon ion-search placeholder-icon" ></i>
+        <input type="search" style="width: 100%" ng-model="search.item_name">
+    </label>
+
+  </div>
+
+  <ion-content class="has-header">
+
+    <ion-refresher
+      pulling-text="Pull to refresh"
+      on-refresh="productListRefresh()">
+    </ion-refresher>
+
+    <ion-list>
+      <ion-item ng-repeat="item in listing  | orderBy:'item_name' | filter:search" href="#/app/sublist/:Features/:{{product.id}}" class="license_info">
+
+        <h3>{{item.item_name}}</h3>
+        <br/><br/>
+        <p>Total Licenses: {{item.totallicenses}}</p>
+        <p>In use licenses: {{item.inuse}}</p>
+        <div class="meterbar"><hr align="left" width="{{item.percentage}}%" style="visibility:{{item.bar_visibility}}"></div>
+      </ion-item>
+    </ion-list>
+    <br/><br/>
+  </ion-content>
+</ion-view>

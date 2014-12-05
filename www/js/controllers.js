@@ -55,45 +55,69 @@ angular.module('openit.controllers', [])
 })
 
 
-.controller('PlaylistsCtrl', function($scope , $http ) {
+.controller('MainListCtrl', function($scope , $stateParams, $http ) {
   
-  
-
+  /*intial load*/
   if ( License_status.length == 0 )
   {
-    VERBOSE("Updating Productlist...");
+    VERBOSE("License_status length is empty force update...");
     var dataurl = getServerUrl();
     VERBOSE("Retrieving data from " + dataurl );
     $http.get( dataurl ).then( function (resp){
       VERBOSE( 'Success' , resp );
       var xmldoc = parseXML( resp.data );
-      $scope.productlist = getLicenseStatus(xmldoc);
+      parseLicenseStatus(xmldoc);
+      setListing();
     }, function( err ) {
-      showError(' Error' ,err );
+      ERROR('Failed to retrieved data');
     });
-
   }
   
+  $scope.category = capitaliseFirstLetter( $stateParams.category.substring(1) );
+  var id = $stateParams.id.substring(1);
+  setListing();
+  
+  /*Functions goes here*/
 
-  $scope.productlist = License_status;
-
+  function setListing (){
+  var features = [];
+  
+  if ( $scope.category.toLowerCase() == 'products')
+    $scope.listing = License_status;
+  else if ( $scope.category.toLowerCase() == 'features')
+  {
+    for (i =0; i !=License_status.length; i++)
+    {
+        License_status[i].features.forEach(function( entry ){
+          features.push( entry );
+        });  
+    }
+    $scope.listing = features;
+  }
+  
+}
+  /*scope functions here*/
   $scope.productListRefresh = function(){
-    VERBOSE("Refreshing xml data");
+    VERBOSE("Refreshing xml data via list drag");
     var dataurl = getServerUrl();
     VERBOSE("Retrieving data from " + dataurl );
     $http.get( dataurl).then( function (resp){
       VERBOSE( 'Success' , resp );
       var xmldoc = parseXML( resp.data );
-      $scope.productlist = getLicenseStatus(xmldoc);
+      parseLicenseStatus(xmldoc);
+      setListing();
       $scope.$broadcast('scroll.refreshComplete');
     }, function( err ) {
       showError(' Error' ,err );
 
     })
   }
+
+ 
+  
 })
 
-.controller('PlaylistCtrl', function($scope, $stateParams , $http ) {
+.controller('SubListCtrl', function($scope, $stateParams , $http ) {
 
    $scope.refreshXMLData = function(){
     VERBOSE("Refreshing xml data");
@@ -102,7 +126,7 @@ angular.module('openit.controllers', [])
     $http.get( dataurl ).then( function (resp){
       VERBOSE( 'Success' , resp );
       var xmldoc = parseXML( resp.data );
-      License_status = getLicenseStatus(xmldoc);
+      License_status = parseLicenseStatus(xmldoc);
       $scope.$broadcast('scroll.refreshComplete');
     }, function( err ) {
       showError(' Error' ,err );

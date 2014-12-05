@@ -47,26 +47,26 @@ angular.module('openit', ['ionic', 'openit.controllers'] )
         }
       }
     })
-    .state('app.playlists', {
-      url: "/playlists",
+    .state('app.mainlist', {
+      url: "/mainlist/:category/:id",
       views: {
         'menuContent' :{
-          templateUrl: "templates/playlists.html",
-          controller: 'PlaylistsCtrl'
+          templateUrl: "templates/mainlist.html",
+          controller: 'MainListCtrl'
         }
       }
     })
 
-    .state('app.single', {
-      url: "/playlists/:category/:id",
+    .state('app.sublist', {
+      url: "/sublist/:category/:id",
       views: {
         'menuContent' :{
-          templateUrl: "templates/playlist.html",
-          controller: 'PlaylistCtrl'
+          templateUrl: "templates/sublist.html",
+          controller: 'SubListCtrl'
         }
       }
     });
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/playlists');
+  $urlRouterProvider.otherwise('/app/mainlist/:products/:all');
 });
 
