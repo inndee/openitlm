@@ -2,11 +2,29 @@ var ServerUrl = "http://devcola.com/public_data/loadxml.php";
 //var ServerUrl ="http://mnl242lin:8080/OpeniT/loadxml.php";
 var License_status = [];
 
+/*-------------------Getters----------------*/
+
 function getServerUrl ()
 {
+	/*Prevent cache*/
 	var randomNum = Math.round(Math.random() * 10000);
 	return ServerUrl + "?rand=" + randomNum;
 }
+
+
+function getAllFeaturesData()
+{
+	var all_features = [];
+	for (i =0; i !=License_status.length; i++)
+    {
+        License_status[i].features.forEach(function( entry ){
+          all_features.push( entry );
+        });  
+    }
+    return all_features;
+}
+
+/*-------------------Formatting----------------*/
 
 /*return epoch time(milliseconds) to string readable*/
 function epochToDate( epoch ) 
@@ -44,6 +62,31 @@ function parseXML( xml_string )
 	}
 	return xmldoc;
 }
+
+
+
+function formatHtmlDetails( format_type, data )
+{
+	if ( format_type =='users' )
+	{
+		data.forEach( function (user) {
+			user.usage.forEach( function (usage) {
+
+			});
+		});
+	}
+	
+}
+
+
+function removeDuplicatesInArray( array_data )
+{
+	var uniqueArray = array_data.filter(function(elem, pos) {
+    	return array_data.indexOf(elem) == pos;
+  	}); 
+  	return uniqueArray;
+}
+
 
 /*Load list of products
 use 'all' for no filter
@@ -109,7 +152,7 @@ function parseLicenseStatus( xmldata )
 			{
 				
 				userslist.push({ 
-							user: entries[entry_id].getElementsByTagName("user")[0].innerHTML,
+							item_name: entries[entry_id].getElementsByTagName("user")[0].innerHTML,
 							display: entries[entry_id].getElementsByTagName("display")[0].innerHTML,
 							host: entries[entry_id].getElementsByTagName("host")[0].innerHTML,
 							count: entries[entry_id].getElementsByTagName("count")[0].innerHTML 
@@ -242,98 +285,50 @@ function getFeatureList( xmldata , filter )
 	return list;
 }
 
-function getUsersOfFeature()
+
+function getAllUsersUsage()
 {
+	var usersdata = [];
+        //TODO: get all users entry
+        for (i =0; i !=License_status.length; i++)
+        {
+            License_status[i].features.forEach(function( entry ){
+              if ( entry.users != 0 )
+              {
+                  entry.users.forEach(function( user ) {
+                    user["productname"] = License_status[i].item_name;
+                    user["featurename"] = entry.item_name;
+                    usersdata.push( user );
+                  });
+              }       
+            });  
+        }
 
-	if (XMLDoc == undefined )
-	{
-		VERBOSE( "XMLDoc is null " );
-		return;
-	}
-	
-	DEBUG("Got filter '" + CurrentFilters + "'" );
-	
-	var filter = CurrentFilters.split('|');
-	
-	var vendorlicenses = XMLDoc.getElementsByTagName( "vendorlicense" );
-	var found = false;
-	// Filter product name
-	if ( filter[1] != 'all' )
-	{
-		for( i=0; i < vendorlicenses.length; ++i )
-		{
-			if (vendorlicenses[i].getAttribute("name") == filter[1] )
-			{
-				var temp = vendorlicenses[i];
-				vendorlicenses = [];
-				vendorlicenses.push(temp);
-				VERBOSE( "Found productname match for'" + filter[1]  + "'" );
-				break;
-			}
-		}
-	}
-	
-	//find feature
-	var features = vendorlicenses[0].getElementsByTagName("feature");
-	
-	for ( i=0; i < features.length; ++i )
-	{
-		// Filter Features name
-		if ( filter[2] != 'all' )
-		{
-			
-			var name = features[i].getAttribute("name");
-			if ( name == filter[2] )
-			{
-				var temp = features[i];
-				features = [];
-				features.push(temp);
-				VERBOSE( "Found feature name match for'" + filter[2]  + "'" );
-				break;
-			}
-		
-		}			
-	}
-	
-	var online = features[0].getElementsByTagName("online");
-	var online_entries = online[0].getElementsByTagName("entry");
-	
-	var queued = features[0].getElementsByTagName("queued");
-	var queued_entries = queued[0].getElementsByTagName("entry");
-	
-	
-	//get online entries
-	var online_list =[];
-	for( i=0; i < online_entries.length; ++i )
-	{
-		/*var user = online_entries[i].childNodes[1].innerHTML;
-		var display = online_entries[i].childNodes[3].innerHTML;
-		var host = online_entries[i].childNodes[5].innerHTML;
-		var start = online_entries[i].childNodes[7].innerHTML;
-		var count = online_entries[i]..childNodes[9].innerHTML;*/
-		
-		online_list.push({
-			id : i,
-			user : online_entries[i].childNodes[1].innerHTML,
-			display : online_entries[i].childNodes[3].innerHTML,
-			host : online_entries[i].childNodes[5].innerHTML,
-			start : epochToDate( online_entries[i].childNodes[7].innerHTML ),
-			count : online_entries[i].childNodes[9].innerHTML
-			
-		});
-	}
-	
-	//TODO: listing of queued data
-	
-	var list = [];
-	list.push({online : online_list } );
-	return list;
-}
+          var listofusers = [];
 
+          //get list of users first
+          usersdata.forEach( function ( entry ) {
+           listofusers.push(entry.item_name); 
+          }); 
 
-function getMeterBarHtml()
-{
+          //merge duplicates
+          var unique_users = removeDuplicatesInArray( listofusers );
 
+          //organize data
+          var users_usage_data = [];
+          unique_users.forEach( function (user) {
+            var userdata = [];
+            var usage = [];
+            userdata["item_name"] = user;
+            usersdata.forEach( function (data) {
+              if ( user == data.item_name )
+                 usage.push( data );
+            })
+            userdata["usage"] = usage;
+            users_usage_data.push(userdata);
+          });
+
+          return users_usage_data;
 
 }
 

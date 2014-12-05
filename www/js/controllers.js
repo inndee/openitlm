@@ -70,6 +70,7 @@ angular.module('openit.controllers', [])
       prepareListing();
     }, function( err ) {
       ERROR('Failed to retrieved data');
+      $scope.$broadcast('scroll.refreshComplete');
     });
   }
   
@@ -79,23 +80,27 @@ angular.module('openit.controllers', [])
   
   /*Functions goes here*/
 
-  function prepareListing (){
-      var features = [];
+  function prepareListing ()
+  {
       
+      DEBUG("Preparing list.");
       if ( $scope.category.toLowerCase() == 'products')
         $scope.listing = License_status;
       else if ( $scope.category.toLowerCase() == 'features')
       {
-        for (i =0; i !=License_status.length; i++)
-        {
-            License_status[i].features.forEach(function( entry ){
-              features.push( entry );
-            });  
-        }
-        $scope.listing = features;
+        $scope.listing = getAllFeaturesData();
+        DEBUG("Got '" + $scope.listing.length + "' features.");
       }
-    
+      else if ( $scope.category.toLowerCase() =='users')
+      {
+        $scope.listing = getAllUsersUsage();
+        //var userusage = formatHtmlDetails('users', usage);
+      }
+
+     
   }
+
+
   /*scope functions here*/
   $scope.productListRefresh = function(){
     VERBOSE("Refreshing xml data via list drag");
@@ -109,6 +114,7 @@ angular.module('openit.controllers', [])
       $scope.$broadcast('scroll.refreshComplete');
     }, function( err ) {
       showError(' Error' ,err );
+      $scope.$broadcast('scroll.refreshComplete');
 
     })
   }
