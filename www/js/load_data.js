@@ -63,6 +63,12 @@ function parseXML( xml_string )
 	return xmldoc;
 }
 
+function convertToJson( xml )
+{
+	var json = parseXML ( xml );
+	return JSON.parse( xml2json(json,'	') );
+}
+
 
 
 function formatHtmlDetails( format_type, data )

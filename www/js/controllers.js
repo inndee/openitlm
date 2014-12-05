@@ -59,13 +59,16 @@ angular.module('openit.controllers', [])
   
   /*intial load*/
   if ( License_status.length == 0 )
-  {
+  { 
     VERBOSE("License_status length is empty force update...");
     var dataurl = getServerUrl();
     VERBOSE("Retrieving data from " + dataurl );
     $http.get( dataurl ).then( function (resp){
       VERBOSE( 'Success' , resp );
       var xmldoc = parseXML( resp.data );
+      var json = []; 
+      json = convertToJson( resp.data );
+      var name = json.realtime.vendorlicenses.vendorlicense[0]["@name"];
       parseLicenseStatus(xmldoc);
       prepareListing();
     }, function( err ) {
