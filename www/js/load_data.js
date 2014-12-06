@@ -1,6 +1,7 @@
 var ServerUrl = "http://devcola.com/public_data/loadxml.php";
 //var ServerUrl ="http://mnl242lin:8080/OpeniT/loadxml.php";
-var License_status = [];
+
+var LicenseStatus = [];
 
 /*-------------------Getters----------------*/
 
@@ -11,19 +12,6 @@ function getServerUrl ()
 	return ServerUrl + "?rand=" + randomNum;
 }
 
-
-function getAllFeaturesData()
-{
-	var all_features = [];
-	for (i =0; i !=License_status.length; i++)
-    {
-        License_status[i].features.forEach(function( entry ){
-          all_features.push( entry );
-        });  
-    }
-    return all_features;
-}
-
 /*-------------------Formatting----------------*/
 
 /*return epoch time(milliseconds) to string readable*/
@@ -32,14 +20,8 @@ function epochToDate( epoch )
 	epoch = parseFloat( epoch ) * 1000;
 	var dateVal ="/Date("+ epoch +")/";
 	var date = new Date( parseFloat( dateVal.substr(6 )));
-	var date_str = 
-		(date.getMonth() + 1) + "/" +
-		date.getDate() + "/" +
-		date.getFullYear() + " " +
-		date.getHours() + ":" +
-		date.getMinutes() + ":" +
-		date.getSeconds();
-	return date_str;
+
+	return date.toLocaleString();
 
 }
 
@@ -71,19 +53,146 @@ function convertToJson( xml )
 
 
 
-function formatHtmlDetails( format_type, data )
+function prepareDataListing()
 {
-	if ( format_type =='users' )
+	if ( LicenseStatus.length == 0 )
 	{
-		data.forEach( function (user) {
-			user.usage.forEach( function (usage) {
+		ERROR('prepareDataForListing:Failed to prepare data LicenseStatus is empty');
+		return;
+	}
+	/*summarized totallicenses and in use for products*/
 
-			});
+	DEBUG('Preparing Product data...');
+	for ( i = 0 ; i !=LicenseStatus.realtime.vendorlicenses.vendorlicense.length ; i++ )
+	{
+		var vlicense = LicenseStatus.realtime.vendorlicenses.vendorlicense[i];
+		var totallicenses = 0;
+		var totaluse = 0;
+
+		/*get all features , totallicenses and  total in use*/
+		vlicense.daemons.daemon.features.feature.forEach( function ( feature ) {
+			totallicenses += parseInt (feature.licenses);
+			totaluse += parseInt (feature.used);
 		});
+		 
+		
+		LicenseStatus.realtime.vendorlicenses.vendorlicense[i]["id"] = i;
+		LicenseStatus.realtime.vendorlicenses.vendorlicense[i]["totallicenses"] = totallicenses;
+		LicenseStatus.realtime.vendorlicenses.vendorlicense[i]["inuse"] = totaluse;
+
+
+		var htmlformat = formatHTMLProductItem( LicenseStatus.realtime.vendorlicenses.vendorlicense[i] );
+		LicenseStatus.realtime.vendorlicenses.vendorlicense[i]["html"] = htmlformat;
+
+	}
+
+	DEBUG ('Preparing Feature data');
+	var all_features = [];
+	for ( i = 0 ; i !=LicenseStatus.realtime.vendorlicenses.vendorlicense.length ; i++ )
+	{
+		var vlicense = LicenseStatus.realtime.vendorlicenses.vendorlicense[i];
+		var id = 0;
+		vlicense.daemons.daemon.features.feature.forEach( function ( feature ) {
+			feature["id"] = id;
+			feature["productname"] = vlicense.name;
+			feature["daemon_name"] = vlicense.daemons.daemon.name;
+			feature["daemon_status"] = vlicense.daemons.daemon.status;
+			feature["daemon_version"] = vlicense.daemons.daemon.version;
+			feature["html"] = formatHTMLFeatureItem( feature );
+			all_features.push( feature );
+			id++;
+		});
+		
 	}
 	
+	LicenseStatus.realtime["featureslist"] = all_features;
+
+	DEBUG("Preparing users list");
+	var all_users = [];
+	
+	for ( i = 0 ; i !=all_features.length ; i++ )
+	{
+		if (all_features[i].online == null)
+			continue;
+		var productname = all_features[i].productname; 
+		var featurename = all_features[i].name; 
+		
+		/*get entries*/
+		var entries = all_features[i].online.entry;
+		if ( entries.constructor != Array)
+		{
+			entries["productname"] = productname;
+			entries["featurename"] = featurename;
+			all_users.push ( entries );
+		}
+		else
+		{
+			entries.forEach( function(entry){
+				entry["productname"] = productname;
+				entry["featurename"] = featurename;
+				all_users.push ( entry );
+			});
+		}
+		
+
+	}
+
+	var uniqueUsers = removeDuplicatesInArray(all_users);
 }
 
+function formatHTMLProductItem( data )
+{
+	var header = "<h3>" + data.name + "</h3>";
+	var usage_meter = "";
+
+	var percentage = parseInt( (data.inuse/data.totallicenses) * 100 );
+	
+	if ( percentage != 0 )
+		usage_meter = "<hr align='left' width='" + percentage + "%' />"; 
+	
+	var details = "";
+	
+	
+	details += "<p class='inline' >Total Licenses: " + data.totallicenses + "</p>   " +
+			   "<p class='inline'>In Use Licenses: " + data.inuse + "</p>";
+
+	var meterbar =	"<br/><br/><br/>" +
+					"<div class='meterbar'>" + 
+						usage_meter +
+			  		"</div>";
+	var item = header + details + meterbar;
+	return item;
+
+}
+
+function formatHTMLFeatureItem( data )
+{
+	var header = "<h3>" + data.name +" </h3>";
+
+	var usage_meter = "";
+
+	var percentage = parseInt( (data.used/data.licenses) * 100 );
+	
+	if ( percentage != 0 )
+		usage_meter = "<hr align='left' width='" + percentage + "%' />"; 
+	
+	var details = "";
+	details += "<p>Version: " + data.version + "</p></br/><br/>";
+	details += "<p>Product name: " + data.productname + "</p>";
+	details += "<p>Expires: " + epochToDate( data.expires )+ "</p>";
+	
+	details += "<h4 class='inline'>Total Licenses: " + data.licenses + "</h4>   " +
+			   "<h4 class = 'inline'>In Use Licenses: " + data.used + "</h4>";
+
+	var meterbar =	"<br/><br/>" +
+					"<div class='meterbar'>" + 
+						usage_meter +
+			  		"</div>";
+	
+	var item = header + details + meterbar;
+	return item;
+
+}
 
 function removeDuplicatesInArray( array_data )
 {
@@ -94,248 +203,9 @@ function removeDuplicatesInArray( array_data )
 }
 
 
-/*Load list of products
-use 'all' for no filter
-*/
-function parseLicenseStatus( xmldata )
-{
-	
-	if (xmldata == undefined )
-	{
-		ERROR( "XMLDoc is null" );
-		return;
-	}
-		
-	VERBOSE("parsing License status data");
-	var vendorlicenses = xmldata.getElementsByTagName( "vendorlicense" );
-	
-	//create list of products
-	var list=[];
-	
-	for ( i=0; i < vendorlicenses.length; ++i )
-	{
-	
-		var featureslist = [];
-		var features = vendorlicenses[i].getElementsByTagName( "feature" );
-		
-		//get list of features under this product
-		for ( counter = 0; counter < features.length; ++counter)
-		{
-			var expires = features[counter].getAttribute("expires") ;
-			expires = epochToDate ( expires );
-			var used = features[counter].getAttribute("used");
-			var licenses = features[counter].getAttribute("licenses");
-			var percentage = parseInt( (used/licenses) * 100 );
-			
-			var visible = "hidden";
-			var usage_meter = "";
-			if ( percentage != 0 )
-			{
-				visible = "visible";
-				usage_meter = "<hr align='left' width='" + percentage + "%' />"; 
-			}
-				
-				
-			var details = "<p>Product:  <b>" + vendorlicenses[i].getAttribute("name")  +"</b></p>" +
-						  "<p>Licenses: <b>" + licenses + "</b></p>" +
-						  "<p>In Use  : <b>" + used 	 + "</b></p><br/>" +
-						  "<p>Expires : <b>" + expires  + "</b></p>";
-			
-			details += "<br/><br/><div class='meterbar'>" + 
-						usage_meter +
-					   "</div>";
 
 
 
-			
 
-			var online = features[counter].getElementsByTagName("online");
-			var entries = online[0].getElementsByTagName("entry");
-			
-			//get all users
-			var userslist = [];
-			for ( entry_id = 0; entry_id != entries.length; ++entry_id )
-			{
-				
-				userslist.push({ 
-							item_name: entries[entry_id].getElementsByTagName("user")[0].innerHTML,
-							display: entries[entry_id].getElementsByTagName("display")[0].innerHTML,
-							host: entries[entry_id].getElementsByTagName("host")[0].innerHTML,
-							count: entries[entry_id].getElementsByTagName("count")[0].innerHTML 
-						});
-			}
-
-			featureslist.push({ id	: i,
-					item_name 		: features[counter].getAttribute("name") ,
-					productname		: vendorlicenses[i].getAttribute("name")  ,
-					version			: features[counter].getAttribute("version") ,
-					expires			: expires,
-					licenses		: features[counter].getAttribute("licenses") ,
-					used 			: used ,
-					users 			: userslist, 		
-					percentage		: percentage,
-					bar_visibility  : visible,
-					detailshtml 	: details  });
-		} 
-
-		var totallicenses = 0;
-		var inuse = 0;
-		
-		for ( counter = 0; counter < features.length; ++counter )
-		{
-			totallicenses += parseInt( features[counter].getAttribute("licenses") );
-			inuse += parseInt( features[counter].getAttribute("used") );
-		}
-		
-		var percentage = parseInt( (inuse/totallicenses) * 100 );
-		
-		var visible = "hidden";
-		var usage_meter = "";
-		if ( percentage != 0 )
-		{
-			visible = "visible";
-			usage_meter = "<hr align='left' width='" + percentage + "%' />"; 
-		}
-			
-			
-		var details = "<p>Total Licenses:<b> " + totallicenses + "</b></p>" +
-					  "<p>In Use Licenses:<b> " + inuse + "</b></p>";
-		
-		details += "<br/><br/><div class='meterbar'>" + 
-					usage_meter +
-				   "</div>";
-		
-		var license = vendorlicenses[i].getElementsByTagName("licensefile")[0];
-
-		if ( license != undefined )
-			license = license.innerHTML;
-
-		
-		list.push({ id				: i,
-					item_name 		: vendorlicenses[i].getAttribute("name")  ,
-					client			: vendorlicenses[i].getAttribute("client"),
-					type			: vendorlicenses[i].getAttribute("type") ,
-					licensefile 	: license,
-					features		: featureslist,
-					totallicenses	: totallicenses ,
-					inuse 			: inuse,
-					unused 			: parseInt( totallicenses - inuse ),
-					percentage		: percentage,
-					bar_visibility  : visible ,
-					detailshtml		: details
-				});
-	}
-	DEBUG("Got '" + list.length + "' products");
-	License_status = list;
-	return list;
-}
-
-function getFeatureList( xmldata , filter )
-{
-	if (xmldata == undefined )
-	{
-		VERBOSE( "load_data-loadFeatures: XMLDoc is null " );
-		return;
-	}
-	
-	
-	
-	var vendorlicenses = xmldata.getElementsByTagName( "vendorlicense" );
-	
-	// Filter product name
-	if ( filter != 'all' )
-	{
-		for( i=0; i < vendorlicenses.length; ++i )
-		{
-			if (vendorlicenses[i].getAttribute("name") == filter[1] )
-			{
-				var temp = vendorlicenses[i];
-				vendorlicenses = [];
-				vendorlicenses.push(temp);
-				break;
-			}
-		}
-	}
-	
-	var list = [];
-	for ( i=0; i < vendorlicenses.length; ++i )
-	{
-		var productname = vendorlicenses[i].getAttribute("name");
-		var features = vendorlicenses[i].getElementsByTagName( "feature" );
-		for ( counter=0; counter < features.length; ++counter )
-		{
-			var expires = features[counter].getAttribute("expires") ;
-			expires = epochToDate ( expires );
-			var used = features[counter].getAttribute("used");
-			var licenses = features[counter].getAttribute("licenses");
-			var percentage = parseInt( (used/licenses) * 100 );
-			var visible = "hidden";
-			if ( percentage != 0 )
-				visible = "visible";
-			
-			
-			list.push({ id				: i,
-					name 			: features[counter].getAttribute("name") ,
-					productname		: productname ,
-					version			: features[counter].getAttribute("version") ,
-					expires			: expires,
-					licenses		: features[counter].getAttribute("licenses") ,
-					used 			: used ,
-					percentage		: percentage,
-					bar_visibility  : visible });
-			
-	
-			
-		}
-	}
-	return list;
-}
-
-
-function getAllUsersUsage()
-{
-	var usersdata = [];
-        //TODO: get all users entry
-        for (i =0; i !=License_status.length; i++)
-        {
-            License_status[i].features.forEach(function( entry ){
-              if ( entry.users != 0 )
-              {
-                  entry.users.forEach(function( user ) {
-                    user["productname"] = License_status[i].item_name;
-                    user["featurename"] = entry.item_name;
-                    usersdata.push( user );
-                  });
-              }       
-            });  
-        }
-
-          var listofusers = [];
-
-          //get list of users first
-          usersdata.forEach( function ( entry ) {
-           listofusers.push(entry.item_name); 
-          }); 
-
-          //merge duplicates
-          var unique_users = removeDuplicatesInArray( listofusers );
-
-          //organize data
-          var users_usage_data = [];
-          unique_users.forEach( function (user) {
-            var userdata = [];
-            var usage = [];
-            userdata["item_name"] = user;
-            usersdata.forEach( function (data) {
-              if ( user == data.item_name )
-                 usage.push( data );
-            })
-            userdata["usage"] = usage;
-            users_usage_data.push(userdata);
-          });
-
-          return users_usage_data;
-
-}
 
 

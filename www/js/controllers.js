@@ -56,21 +56,20 @@ angular.module('openit.controllers', [])
 
 
 .controller('MainListCtrl', function($scope , $stateParams, $http ) {
-  
+   
   /*intial load*/
-  if ( License_status.length == 0 )
+
+  if ( LicenseStatus.length == 0 )
   { 
     VERBOSE("License_status length is empty force update...");
     var dataurl = getServerUrl();
     VERBOSE("Retrieving data from " + dataurl );
     $http.get( dataurl ).then( function (resp){
-      VERBOSE( 'Success' , resp );
-      var xmldoc = parseXML( resp.data );
-      var json = []; 
-      json = convertToJson( resp.data );
-      var name = json.realtime.vendorlicenses.vendorlicense[0]["@name"];
-      parseLicenseStatus(xmldoc);
-      prepareListing();
+      VERBOSE( 'Success' , resp ); 
+      LicenseStatus = convertToJson( resp.data );
+      if ( LicenseStatus.length != 0 )
+        prepareData();
+        
     }, function( err ) {
       ERROR('Failed to retrieved data');
       $scope.$broadcast('scroll.refreshComplete');
@@ -79,34 +78,35 @@ angular.module('openit.controllers', [])
   
   $scope.category = capitaliseFirstLetter( $stateParams.category.substring(1) );
   var id = $stateParams.id.substring(1);
-  prepareListing();
-  
+
+  if ( LicenseStatus.length != 0 )
+    prepareData();
+
   /*Functions goes here*/
 
-  function prepareListing ()
+  function prepareData ()
   {
       
-      DEBUG("Preparing list.");
+      DEBUG("Preparing data....");
+      prepareDataListing();
+      
+      if ( LicenseStatus == undefined  )
+        return;
+      
       if ( $scope.category.toLowerCase() == 'products')
-        $scope.listing = License_status;
+          $scope.listing = LicenseStatus.realtime.vendorlicenses.vendorlicense;
       else if ( $scope.category.toLowerCase() == 'features')
-      {
-        $scope.listing = getAllFeaturesData();
-        DEBUG("Got '" + $scope.listing.length + "' features.");
-      }
-      else if ( $scope.category.toLowerCase() =='users')
-      {
-        $scope.listing = getAllUsersUsage();
-        //var userusage = formatHtmlDetails('users', usage);
-      }
-
+           $scope.listing = LicenseStatus.realtime.featureslist;
+     
+      if ($scope.listing.length != 0 ) 
+        return true;
      
   }
 
 
   /*scope functions here*/
   $scope.productListRefresh = function(){
-    VERBOSE("Refreshing xml data via list drag");
+   /* VERBOSE("Refreshing xml data via list drag");
     var dataurl = getServerUrl();
     VERBOSE("Retrieving data from " + dataurl );
     $http.get( dataurl).then( function (resp){
@@ -119,7 +119,7 @@ angular.module('openit.controllers', [])
       showError(' Error' ,err );
       $scope.$broadcast('scroll.refreshComplete');
 
-    })
+    })*/
   }
 
  
@@ -143,10 +143,6 @@ angular.module('openit.controllers', [])
     })
   }
   
-  var id = $stateParams.id.substring(1);
-  $scope.id = id;
-  $scope.category = $stateParams.category.substring(1);
-  $scope.productname = License_status[$scope.id].productname;
-  $scope.features = License_status[$scope.id].features; 
+
 
 });

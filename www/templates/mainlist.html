@@ -8,7 +8,7 @@
 
     <label class="item item-input">
         <i class="icon ion-search placeholder-icon" ></i>
-        <input type="search" style="width: 100%" ng-model="search.item_name">
+        <input type="search" style="width: 100%" ng-model="search.name">
     </label>
 
   </div>
@@ -21,12 +21,9 @@
     </ion-refresher>
 
     <ion-list>
-      <ion-item ng-repeat="item in listing  | orderBy:'item_name' | filter:search" href="#/app/sublist/:Features/:{{product.id}}" class="license_info">
+      <ion-item ng-repeat="item in listing | orderBy:'name' | filter:search" href="#/app/sublist/:Features/:{{product.id}}" class="license_info">
 
-        <h3>{{item.item_name}}</h3>
-        <br/><br/>
-        <div ng-bind-html="item.detailshtml"></div>
-
+        <div ng-bind-html="item.html"></div>
         
       </ion-item>
     </ion-list>

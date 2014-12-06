@@ -56,7 +56,7 @@ angular.module('openit', ['ionic', 'openit.controllers'] )
         }
       }
     })
-
+    
     .state('app.sublist', {
       url: "/sublist/:category/:id",
       views: {
