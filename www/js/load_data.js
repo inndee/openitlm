@@ -1,7 +1,22 @@
 var ServerUrl = "http://devcola.com/public_data/loadxml.php";
-//var ServerUrl ="http://mnl242lin:8080/OpeniT/loadxml.php";
+//var ServerUrl ="http://mnl242lin:8080/OpeniT/loadxml.ph1p";
+//var ServerUrl ="http://127.0.0.1:8100/loadxml.php";
 
 var LicenseStatus = [];
+
+/**/
+function getArraySubObjects (data)
+{
+	if (data.constructor != Array )
+	{
+		var temp = [];
+		temp.push (data)
+		return temp
+	}
+	else
+		return data;
+		
+}
 
 /*-------------------Getters----------------*/
 
@@ -55,89 +70,95 @@ function convertToJson( xml )
 
 function prepareDataListing()
 {
-	if ( LicenseStatus.length == 0 )
+	if ( LicenseStatus.length == 0  || LicenseStatus.realtime == null )
 	{
 		ERROR('prepareDataForListing:Failed to prepare data LicenseStatus is empty');
-		return;
+		return false;
 	}
+	
 	/*summarized totallicenses and in use for products*/
 
 	DEBUG('Preparing Product data...');
-	for ( i = 0 ; i !=LicenseStatus.realtime.vendorlicenses.vendorlicense.length ; i++ )
-	{
-		var vlicense = LicenseStatus.realtime.vendorlicenses.vendorlicense[i];
+	var all_products = [];
+	getArraySubObjects( LicenseStatus.realtime.vendorlicenses.vendorlicense ).forEach (function ( vlicense ){
 		var totallicenses = 0;
 		var totaluse = 0;
-
-		/*get all features , totallicenses and  total in use*/
-		vlicense.daemons.daemon.features.feature.forEach( function ( feature ) {
+		
+		/*get totallicenses and inuse*/
+		getArraySubObjects( vlicense.daemons.daemon.features.feature).forEach( function (feature){
 			totallicenses += parseInt (feature.licenses);
 			totaluse += parseInt (feature.used);
 		});
-		 
-		
-		LicenseStatus.realtime.vendorlicenses.vendorlicense[i]["id"] = i;
-		LicenseStatus.realtime.vendorlicenses.vendorlicense[i]["totallicenses"] = totallicenses;
-		LicenseStatus.realtime.vendorlicenses.vendorlicense[i]["inuse"] = totaluse;
 
-
-		var htmlformat = formatHTMLProductItem( LicenseStatus.realtime.vendorlicenses.vendorlicense[i] );
-		LicenseStatus.realtime.vendorlicenses.vendorlicense[i]["html"] = htmlformat;
-
-	}
+		vlicense["totallicenses"] = totallicenses;
+		vlicense["inuse"] = totaluse;
+		vlicense["html"] = formatHTMLProductItem( vlicense ); 
+		all_products.push ( vlicense );
+	});
+	
+	LicenseStatus.realtime["productlist"] = all_products;
 
 	DEBUG ('Preparing Feature data');
 	var all_features = [];
-	for ( i = 0 ; i !=LicenseStatus.realtime.vendorlicenses.vendorlicense.length ; i++ )
-	{
-		var vlicense = LicenseStatus.realtime.vendorlicenses.vendorlicense[i];
-		var id = 0;
-		vlicense.daemons.daemon.features.feature.forEach( function ( feature ) {
-			feature["id"] = id;
+	getArraySubObjects( LicenseStatus.realtime.vendorlicenses.vendorlicense ).forEach (function ( vlicense ){
+		
+		getArraySubObjects( vlicense.daemons.daemon.features.feature).forEach( function (feature){
 			feature["productname"] = vlicense.name;
 			feature["daemon_name"] = vlicense.daemons.daemon.name;
 			feature["daemon_status"] = vlicense.daemons.daemon.status;
 			feature["daemon_version"] = vlicense.daemons.daemon.version;
 			feature["html"] = formatHTMLFeatureItem( feature );
 			all_features.push( feature );
-			id++;
 		});
-		
-	}
+
+	});
 	
 	LicenseStatus.realtime["featureslist"] = all_features;
 
-	DEBUG("Preparing users list");
-	var all_users = [];
+
 	
-	for ( i = 0 ; i !=all_features.length ; i++ )
-	{
-		if (all_features[i].online == null)
-			continue;
-		var productname = all_features[i].productname; 
-		var featurename = all_features[i].name; 
+	DEBUG("Preparing users list");
+	
+	var all_usage = [];
+	getArraySubObjects( all_features ).forEach( function (feature){
 		
-		/*get entries*/
-		var entries = all_features[i].online.entry;
-		if ( entries.constructor != Array)
-		{
-			entries["productname"] = productname;
-			entries["featurename"] = featurename;
-			all_users.push ( entries );
-		}
-		else
-		{
-			entries.forEach( function(entry){
-				entry["productname"] = productname;
-				entry["featurename"] = featurename;
-				all_users.push ( entry );
-			});
-		}
+		if (feature.online == null)
+			return;
+			
 		
+		getArraySubObjects( feature.online.entry ).forEach ( function (entry) {
+			entry["productname"] = feature.productname;
+			entry["featurename"] = feature.name;
+			all_usage.push ( entry );
+		});
+	});
 
-	}
 
-	var uniqueUsers = removeDuplicatesInArray(all_users);
+
+	
+	
+	/*get the list of uniqueusers*/
+	var uniqueusers = [];
+	getArraySubObjects( all_usage ).forEach ( function (entry) { 
+		uniqueusers.push (entry.user);
+	});
+
+	uniqueusers = removeDuplicatesInArray(uniqueusers);
+	var users_usage =[];
+	getArraySubObjects( uniqueusers ).forEach ( function (user) {
+		var usage = [];
+		getArraySubObjects(all_usage).forEach (function (entry){
+			if (user == entry.user)
+				usage.push( entry );
+		});
+
+		var htmlitem = formatHTMLUserItem ( user , usage ); 
+		users_usage.push( { name : user , use : usage, html : htmlitem });
+		
+	});
+	
+
+	LicenseStatus.realtime["userslist"] = users_usage;
 }
 
 function formatHTMLProductItem( data )
@@ -192,6 +213,14 @@ function formatHTMLFeatureItem( data )
 	var item = header + details + meterbar;
 	return item;
 
+}
+
+function formatHTMLUserItem ( user, usage )
+{
+	var header = "<h3>" + user +" </h3>";
+	var details = "<h4>Use licenses: " + usage.length + "</h4>"
+	var item = header + details;
+	return item;
 }
 
 function removeDuplicatesInArray( array_data )

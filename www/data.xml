@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<realtime>
+    <meta name="collection_time" content="1415192708" />
+    <vendorlicenses>
+        <vendorlicense name="hou250lin;artwork" type="Flex" mapped_to="ARTWORKCOMBINED">
+            <polltime>1383583801</polltime>
+            <poller>/usr/flex/lmutil</poller>
+            <pollinterval>0</pollinterval>
+            <polloffset>0</polloffset>
+            <licensefile>/usr/flex/license.dat</licensefile>
+            <servers>
+                <server name="hou250lin" port="?">
+                    <status />
+                </server>
+            </servers>
+            <daemons>
+                <daemon name="" version="">
+                    <status></status>
+                    <features>
+                        <feature name="ACS3521" version="1" expires="1550296800" licenses="10" used="0">
+                            <online />
+                            <queued />
+                        </feature>
+                        <feature name="ACS5II" version="1" expires="1550296800" licenses="10" used="0">
+                            <online />
+                            <queued />
+                        </feature>
+                    </features>
+                </daemon>
+            </daemons>
+        </vendorlicense>
+        <vendorlicense name="hou210win;artwork" type="Flex" mapped_to="ARTWORKCOMBINED">
+            <polltime>1383584101</polltime>
+            <poller>C_\flexlm-artwork\lmutil.exe</poller>
+            <pollinterval>0</pollinterval>
+            <polloffset>0</polloffset>
+            <licensefile>C_\flexlm-artwork\license.dat</licensefile>
+            <servers>
+                <server name="hou210win" port="27000" master="true">
+                    <status>UP</status>
+                </server>
+            </servers>
+            <daemons>
+                <daemon name="artwork" version="v11.3">
+                    <status>UP</status>
+                    <features>
+                        <feature name="ACS352O" version="1" expires="1550296800" licenses="10" used="0">
+                            <online />
+                            <queued />
+                        </feature>
+                        <feature name="ACS5II" version="1" expires="1550296800" licenses="10" used="0">
+                            <online />
+                            <queued />
+                        </feature>
+                    </features>
+                </daemon>
+            </daemons>
+        </vendorlicense>
+        <vendorlicense name="hou211lin;ansyslmd" type="Flex" client="hou211lin">
+            <polltime>1383583801</polltime>
+            <poller>/usr/flex/ANSYS/lmutil</poller>
+            <pollinterval>0</pollinterval>
+            <polloffset>0</polloffset>
+            <licensefile>/usr/flex/ANSYS/license.dat</licensefile>
+            <servers>
+                <server name="hou211lin" port="1055" master="true">
+                    <status>UP</status>
+                </server>
+            </servers>
+            <daemons>
+                <daemon name="ansyslmd" version="v11.9">
+                    <status>UP</status>
+                    <features>
+                        <feature name="acfd1" version="9999.9999" expires="1396238400" licenses="5" used="1">
+                            <online>
+                                <entry handle="707">
+                                    <user>rsalayo</user>
+                                    <display>HOU080WIN</display>
+                                    <host>HOU080WIN.svg.openit.local</host>
+                                    <start>1383320640</start>
+                                    <count>1</count>
+                                </entry>
+                            </online>
+                            <queued />
+                        </feature>
+                        <feature name="agppi" version="9999.9999" expires="1396238400" licenses="5" used="1">
+                            <online>
+                                <entry handle="527">
+                                    <user>rsalayo</user>
+                                    <display>HOU080WIN</display>
+                                    <host>HOU080WIN.svg.openit.local</host>
+                                    <start>1383320640</start>
+                                    <count>1</count>
+                                </entry>
+                            </online>
+                            <queued />
+                        </feature>
+                        <feature name="anshpc" version="9999.9999" expires="1396238400" licenses="10" used="2">
+                            <online>
+                                <entry handle="615">
+                                    <user>rsalayo</user>
+                                    <display>HOU080WIN</display>
+                                    <host>HOU080WIN.svg.openit.local</host>
+                                    <start>1383320640</start>
+                                    <count>2</count>
+                                </entry>
+                            </online>
+                            <queued />
+                        </feature>
+                        <feature name="ansys" version="9999.9999" expires="1396238400" licenses="5" used="2">
+                            <online>
+                                <entry handle="158">
+                                    <user>fmercado</user>
+                                    <display>HOU080WIN</display>
+                                    <host>HOU080WIN.svg.openit.local</host>
+                                    <start>1383320640</start>
+                                    <count>1</count>
+                                </entry>
+                                <entry handle="335">
+                                    <user>jamparo</user>
+                                    <display>HOU080WIN</display>
+                                    <host>HOU080WIN.svg.openit.local</host>
+                                    <start>1383320640</start>
+                                    <count>1</count>
+                                </entry>
+                            </online>
+                            <queued />
+                        </feature>
+                    </features>
+                </daemon>
+            </daemons>
+        </vendorlicense>
+        <vendorlicense name="hou220win;artwork" type="Flex" mapped_to="ARTWORKCOMBINED">
+            <polltime>1383584101</polltime>
+            <poller>c_\flexlm\lmutil.exe</poller>
+            <pollinterval>0</pollinterval>
+            <polloffset>0</polloffset>
+            <licensefile>C_\flexlm\license.dat</licensefile>
+            <servers>
+                <server name="hou220win" port="27000" master="true">
+                    <status>UP</status>
+                </server>
+            </servers>
+            <daemons>
+                <daemon name="artwork" version="v11.3">
+                    <status>UP</status>
+                    <features>
+                        <feature name="ACS352O" version="1" expires="1550296800" licenses="10" used="0">
+                            <online />
+                            <queued />
+                        </feature>
+                        <feature name="ACS5II" version="1" expires="1550296800" licenses="10" used="0">
+                            <online />
+                            <queued />
+                        </feature>
+                    </features>
+                </daemon>
+            </daemons>
+        </vendorlicense>
+        <vendorlicense name="ARTWORKCOMBINED" type="Flex" mapped="true">
+            <polltime>1383583801</polltime>
+            <daemons>
+                <daemon name="" version="">
+                    <status></status>
+                    <features>
+                        <feature name="ACS352O" version="1" expires="1550296800" licenses="30" used="0">
+                            <online />
+                            <queued />
+                        </feature>
+                        <feature name="ACS5II" version="1" expires="1550296800" licenses="30" used="0">
+                            <online />
+                            <queued />
+                        </feature>
+                    </features>
+                </daemon>
+            </daemons>
+        </vendorlicense>
+    </vendorlicenses>
+</realtime>

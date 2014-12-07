@@ -10,8 +10,8 @@
 {
 	line-height: 10pt;
 	color:#191919;
-	-webkit-animation: showFadeFX 0.1s; /* Chrome, Safari, Opera */
-	animation:showFadeFX 0.4s ;
+	-webkit-animation: showFadeFX 0s; /* Chrome, Safari, Opera */
+	animation:showFadeFX 0s ;
 }
 .license_info h3
 {

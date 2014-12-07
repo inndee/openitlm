@@ -1,5 +1,8 @@
 angular.module('openit.controllers', [])
 
+.factory('Data', function () {
+  return { message: "I'm data from a service" };
+})
 
 .controller('AppCtrl', function($scope, $ionicModal, $timeout) {
   // Form data for the login modal
@@ -55,34 +58,50 @@ angular.module('openit.controllers', [])
 })
 
 
-.controller('MainListCtrl', function($scope , $stateParams, $http ) {
+.controller('MainListCtrl', function($scope , $stateParams, $http , $ionicModal ) {
    
   /*intial load*/
+
+  // Create the login modal that we will use later
+  $ionicModal.fromTemplateUrl('templates/login.html', {
+    scope: $scope
+  }).then(function(modal) {
+    $scope.modal = modal;
+  });
+  
+
+  $scope.category = capitaliseFirstLetter( $stateParams.category.substring(1) );
+  var id = $stateParams.id.substring(1);
 
   if ( LicenseStatus.length == 0 )
   { 
     VERBOSE("License_status length is empty force update...");
     var dataurl = getServerUrl();
     VERBOSE("Retrieving data from " + dataurl );
-    $http.get( dataurl ).then( function (resp){
-      VERBOSE( 'Success' , resp ); 
-      LicenseStatus = convertToJson( resp.data );
-      if ( LicenseStatus.length != 0 )
-        prepareData();
+    $http.get( dataurl ).then(
+      function (resp)
+      {
+        VERBOSE( 'Success' , resp ); 
+        LicenseStatus = convertToJson( resp.data );
+        prepareDataListing();
+        if ( LicenseStatus.length != 0 && LicenseStatus.realtime != null )
+          $scope.listing = prepareData();
         
-    }, function( err ) {
+      },
+
+     function( err ) {
       ERROR('Failed to retrieved data');
       $scope.$broadcast('scroll.refreshComplete');
     });
   }
+
+
+    if ( LicenseStatus.length != 0 )
+     $scope.listing = prepareData();
   
-  $scope.category = capitaliseFirstLetter( $stateParams.category.substring(1) );
-  var id = $stateParams.id.substring(1);
-
-  if ( LicenseStatus.length != 0 )
-    prepareData();
-
   /*Functions goes here*/
+
+ 
 
   function prepareData ()
   {
@@ -92,35 +111,46 @@ angular.module('openit.controllers', [])
       
       if ( LicenseStatus == undefined  )
         return;
+        
+      var listing = [];
       
       if ( $scope.category.toLowerCase() == 'products')
-          $scope.listing = LicenseStatus.realtime.vendorlicenses.vendorlicense;
+        listing = LicenseStatus.realtime.productlist;
       else if ( $scope.category.toLowerCase() == 'features')
-           $scope.listing = LicenseStatus.realtime.featureslist;
-     
-      if ($scope.listing.length != 0 ) 
-        return true;
-     
+        listing = LicenseStatus.realtime.featureslist;
+      else if ( $scope.category.toLowerCase() == 'users')
+        listing = LicenseStatus.realtime.userslist;
+      
+      return listing;
   }
-
+  
+ 
 
   /*scope functions here*/
+  
+
   $scope.productListRefresh = function(){
-   /* VERBOSE("Refreshing xml data via list drag");
+    
+    var success = false;
+    VERBOSE("updating license status via list drag.");
     var dataurl = getServerUrl();
     VERBOSE("Retrieving data from " + dataurl );
-    $http.get( dataurl).then( function (resp){
-      VERBOSE( 'Success' , resp );
-      var xmldoc = parseXML( resp.data );
-      parseLicenseStatus(xmldoc);
-      prepareListing();
-      $scope.$broadcast('scroll.refreshComplete');
-    }, function( err ) {
-      showError(' Error' ,err );
-      $scope.$broadcast('scroll.refreshComplete');
-
-    })*/
+    $http.get( dataurl ).then( function (resp) {
+        VERBOSE( 'Success' , resp ); 
+        LicenseStatus = convertToJson( resp.data );
+        if ( LicenseStatus.length != 0 )
+          $scope.listing = prepareData();
+      }, function( err ) {
+        showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.'); 
+      }   
+    )
+    $scope.$broadcast('scroll.refreshComplete');
+    
   }
+
+
+
+
 
  
   
@@ -141,7 +171,7 @@ angular.module('openit.controllers', [])
       showError(' Error' ,err );
 
     })
-  }
+  };
   
 
 
