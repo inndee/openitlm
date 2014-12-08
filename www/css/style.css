@@ -28,6 +28,10 @@
     to {transform: rotate(360deg);}
 }
 
+.scrolly {
+	-webkit-overflow-scrolling: touch;	
+}
+
 
 .no-border
 {

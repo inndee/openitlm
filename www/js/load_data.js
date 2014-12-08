@@ -18,6 +18,14 @@ function getArraySubObjects (data)
 		
 }
 
+function removeDuplicatesInArray( array_data )
+{
+	var uniqueArray = array_data.filter(function(elem, pos) {
+    	return array_data.indexOf(elem) == pos;
+  	}); 
+  	return uniqueArray;
+}
+
 /*-------------------Getters----------------*/
 
 function getServerUrl ()
@@ -63,7 +71,7 @@ function parseXML( xml_string )
 function convertToJson( xml )
 {
 	var json = parseXML ( xml );
-	return JSON.parse( xml2json(json,'	') );
+	return JSON.parse( xml2json(json, '') );
 }
 
 
@@ -77,8 +85,6 @@ function prepareDataListing()
 	}
 	
 	/*summarized totallicenses and in use for products*/
-
-	DEBUG('Preparing Product data...');
 	var all_products = [];
 	getArraySubObjects( LicenseStatus.realtime.vendorlicenses.vendorlicense ).forEach (function ( vlicense ){
 		var totallicenses = 0;
@@ -98,7 +104,7 @@ function prepareDataListing()
 	
 	LicenseStatus.realtime["productlist"] = all_products;
 
-	DEBUG ('Preparing Feature data');
+	
 	var all_features = [];
 	getArraySubObjects( LicenseStatus.realtime.vendorlicenses.vendorlicense ).forEach (function ( vlicense ){
 		
@@ -117,7 +123,6 @@ function prepareDataListing()
 
 
 	
-	DEBUG("Preparing users list");
 	
 	var all_usage = [];
 	getArraySubObjects( all_features ).forEach( function (feature){
