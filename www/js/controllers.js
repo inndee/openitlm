@@ -4,7 +4,9 @@ angular.module('openit.controllers', [])
   return { message: "I'm data from a service" };
 })
 
-.controller('AppCtrl', function($scope, $ionicModal, $rootScope  , $http, $timeout , $location ) {
+
+
+.controller('AppCtrl', function($scope, $ionicModal, $rootScope , $stateParams , $http, $timeout , $location ) {
   // Form data for the login modal
 
   var loading_message = "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h3>";
@@ -41,16 +43,16 @@ angular.module('openit.controllers', [])
         LicenseStatus = convertToJson( resp.data );
         prepareDataListing();
         if ( LicenseStatus.length != 0 && LicenseStatus.realtime != null )
-          $rootScope.listing = LicenseStatus.realtime.productlist;
           $rootScope.collectiontime =  epochToDate (LicenseStatus.realtime.meta.content );
-        
+       
       },
 
      function( err ) {
       ERROR('Failed to retrieved data');
     });
     $scope.closeLogin();
-    $ionicViewService.clearHistory();
+    
+    //$ionicViewService.clearHistory();
     // Simulate a login delay. Remove this and replace with your login
     // code if using a login system
     //$timeout(function() {
@@ -83,7 +85,7 @@ angular.module('openit.controllers', [])
 .controller('MainListCtrl', function($scope, $rootScope , $stateParams, $http , $ionicModal ) {
    
 
-  var loading_message = "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h3>";
+  var loading_message = "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i><br/><br/>Updating license status</h3>";
   /*intial load*/
   $scope.defaultlimit = 25;
   $scope.category = capitaliseFirstLetter( $stateParams.category.substring(1) );
@@ -127,7 +129,7 @@ angular.module('openit.controllers', [])
   {
       
       DEBUG("Preparing data....");
-      prepareDataListing();
+      
       
       if ( LicenseStatus == undefined  )
         return;
@@ -135,11 +137,23 @@ angular.module('openit.controllers', [])
       var listing = [];
       
       if ( $scope.category.toLowerCase() == 'products')
-        listing = LicenseStatus.realtime.productlist;
+      {
+         listing = LicenseStatus.realtime.productlist;
+         listing ["category"] = 'products';
+      }
+        
       else if ( $scope.category.toLowerCase() == 'features')
+      {
         listing = LicenseStatus.realtime.featureslist;
+        listing ["category"] = 'features';
+      }
+        
       else if ( $scope.category.toLowerCase() == 'users')
+      {
         listing = LicenseStatus.realtime.userslist;
+        listing ["category"] = 'users';
+      }
+        
       
       return listing;
   }
@@ -162,13 +176,19 @@ angular.module('openit.controllers', [])
         VERBOSE( 'Success' , resp ); 
         
         LicenseStatus = convertToJson( resp.data );
-        if ( LicenseStatus.length != 0 )
+        if ( LicenseStatus.length != 0  && LicenseStatus.realtime != null )
+        {
+          prepareDataListing();
           $rootScope.listing = prepareData();
+        }
+          
         $rootScope.collectiontime =  epochToDate (LicenseStatus.realtime.meta.content );
       }, function( err ) {
         showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.'); 
       }   
     )
+
+   
     $scope.$broadcast('scroll.refreshComplete');
     
   }
@@ -181,23 +201,62 @@ angular.module('openit.controllers', [])
   
 })
 
-.controller('SubListCtrl', function($scope, $stateParams , $http ) {
+.controller('SubListCtrl', function($scope, $stateParams , $http ,$rootScope) {
 
-   $scope.refreshXMLData = function(){
-    VERBOSE("Refreshing xml data");
+  var loading_message = "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h3>";
+  if ( LicenseStatus.length == 0 )
+  { 
+    $rootScope.listing = [];
+    $rootScope.listing.push({ html: loading_message}) ;
+    VERBOSE("License_status length is empty force update...");
     var dataurl = getServerUrl();
-     VERBOSE("Retrieving data from " + dataurl );
-    $http.get( dataurl ).then( function (resp){
-      VERBOSE( 'Success' , resp );
-      var xmldoc = parseXML( resp.data );
-      License_status = parseLicenseStatus(xmldoc);
+    VERBOSE("Retrieving data from " + dataurl );
+    $http.get( dataurl ).then(
+      function (resp)
+      {
+        VERBOSE( 'Success' , resp ); 
+        LicenseStatus = convertToJson( resp.data );
+        prepareDataListing();
+        prepareData();
+        $rootScope.collectiontime =  epochToDate (LicenseStatus.realtime.meta.content );
+        
+        
+      },
+
+     function( err ) {
+      ERROR('Failed to retrieved data');
       $scope.$broadcast('scroll.refreshComplete');
-    }, function( err ) {
-      showError(' Error' ,err );
+    });
+  }
 
-    })
-  };
+
+   $scope.category =  $stateParams.category.substring(1);
+   $scope.id = $stateParams.id.substring(1) ;
+   if ( LicenseStatus.length != 0 )
+   {
+    prepareData();
+    $rootScope.collectiontime =  epochToDate (LicenseStatus.realtime.meta.content );
+   }
+     
+   
   
+  function prepareData()
+  {
+    
+    /*list down features under this product*/
+     if ( $scope.category == 'products')
+     {
+        var featureslist = [];
+        vlicense = LicenseStatus.realtime.vendorlicenses.vendorlicense[$scope.id];
+        $scope.headeritem = vlicense;
+        LicenseStatus.realtime.featureslist.forEach( function (feature){
+          if (vlicense.name == feature.productname)
+            featureslist.push(feature);    
+        });
 
+     }
+
+     $rootScope.listing = featureslist;
+  }
 
 });

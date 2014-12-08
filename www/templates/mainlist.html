@@ -4,35 +4,37 @@
   </ion-nav-buttons>
 
   <ion-nav-buttons side="right">
-    <button class="button button-icon icon ion-refresh" ng-click="refreshListing()"></button>
+      <button class="button button-icon icon ion-refresh" ng-click="refreshListing()"></button>
   </ion-nav-buttons>
 
 
   <div class="bar bar-footer no-border">
     
-    <label class="item item-input no-border">
+    <label class="item item-input no-border" width="60%">
           <span class="input-label">Search:</span>
-          <input type="search" style="width: 60%" ng-model="search.name">
+          <input type="search"  ng-model="search.name">
     </label>
+
     <label class="item item-input no-border">
           <span class="input-label">Limit:</span>
-          <input type="number" min="1" max="100" ng-model="defaultlimit" >
+          <input type="number" name="input" min="1" max="100" ng-model="defaultlimit" ng-maxlength="3" required>
     </label>
     
   </div>
 
-  <ion-content class="has-header">
+  <ion-content class="has-header"> 
 
     <ion-refresher
       pulling-text="<h6>Current collection time: {{collectiontime}}.<br/> Pull to update.</h6>"
-      on-refresh="refreshListing();">
+      on-refresh="refreshListing();"
+      refreshing-icon="none">
     </ion-refresher>
 
     <ion-list>
-
-      <ion-item ng-repeat="item in listing | orderBy:'name' | limitTo: defaultlimit | filter:search" href="#/app/sublist/:Features/:{{product.id}}" class="license_info">
-
-        <div ng-bind-html="item.html"></div>
+      <a id="top"> </a>
+      <ion-item ng-repeat="item in listing | orderBy:'name' | limitTo: defaultlimit | filter:search" href="#/app/sublist/:{{listing.category}}/:{{item.id}}" class="list-inset license_info">
+     
+      <div ng-bind-html="item.html"></div>
         
       </ion-item>
     </ion-list>

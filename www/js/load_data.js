@@ -86,6 +86,7 @@ function prepareDataListing()
 	
 	/*summarized totallicenses and in use for products*/
 	var all_products = [];
+	var id = 0;
 	getArraySubObjects( LicenseStatus.realtime.vendorlicenses.vendorlicense ).forEach (function ( vlicense ){
 		var totallicenses = 0;
 		var totaluse = 0;
@@ -99,12 +100,13 @@ function prepareDataListing()
 		vlicense["totallicenses"] = totallicenses;
 		vlicense["inuse"] = totaluse;
 		vlicense["html"] = formatHTMLProductItem( vlicense ); 
+		vlicense["id"] = id++;
 		all_products.push ( vlicense );
 	});
 	
 	LicenseStatus.realtime["productlist"] = all_products;
 
-	
+	id = 0;
 	var all_features = [];
 	getArraySubObjects( LicenseStatus.realtime.vendorlicenses.vendorlicense ).forEach (function ( vlicense ){
 		
@@ -114,6 +116,7 @@ function prepareDataListing()
 			feature["daemon_status"] = vlicense.daemons.daemon.status;
 			feature["daemon_version"] = vlicense.daemons.daemon.version;
 			feature["html"] = formatHTMLFeatureItem( feature );
+			feature["id"] = id++;
 			all_features.push( feature );
 		});
 
@@ -125,6 +128,7 @@ function prepareDataListing()
 	
 	
 	var all_usage = [];
+	
 	getArraySubObjects( all_features ).forEach( function (feature){
 		
 		if (feature.online == null)
@@ -134,6 +138,7 @@ function prepareDataListing()
 		getArraySubObjects( feature.online.entry ).forEach ( function (entry) {
 			entry["productname"] = feature.productname;
 			entry["featurename"] = feature.name;
+			
 			all_usage.push ( entry );
 		});
 	});
@@ -168,7 +173,8 @@ function prepareDataListing()
 
 function formatHTMLProductItem( data )
 {
-	var header = "<h3>" + data.name + "</h3>";
+	var icon ="<img src='graphics/product-icon-sm.png' width='20px'>";
+	var header = "<h3>" + icon + data.name + "</h3>";
 	var usage_meter = "";
 
 	var percentage = parseInt( (data.inuse/data.totallicenses) * 100 );
@@ -178,22 +184,26 @@ function formatHTMLProductItem( data )
 	
 	var details = "";
 	
-	
-	details += "<p class='inline' >Total Licenses: " + data.totallicenses + "</p>   " +
-			   "<p class='inline'>In Use Licenses: " + data.inuse + "</p>";
+	details += "<p class='inline'>Type: " + data.type + "</p>";
+	details += "<p class='inline'>polltime: " + epochToDate(data.polltime) + "</p><br/>";
+	if (data.servers != undefined)
+		details += "<p class='inline'>Server: " + data.servers.server.name + ":" + data.servers.server.port+ "</p><br/>";
+	details += "<br/><h6 class='inline' >Total Licenses: " + data.totallicenses + "</h6>   " +
+			   "<h6 class='inline'>In Use Licenses: " + data.inuse + "</h6>";
 
-	var meterbar =	"<br/><br/><br/>" +
+	var meterbar =	"<br/><br/>" +
 					"<div class='meterbar'>" + 
 						usage_meter +
 			  		"</div>";
-	var item = header + details + meterbar;
+	var item =   header + details + meterbar;
 	return item;
 
 }
 
 function formatHTMLFeatureItem( data )
 {
-	var header = "<h3>" + data.name +" </h3>";
+	var icon ="<img src='graphics/feature-icon-sm.png' width='20px'>";
+	var header = "<h3>" + icon + data.name +" </h3>";
 
 	var usage_meter = "";
 
@@ -222,7 +232,8 @@ function formatHTMLFeatureItem( data )
 
 function formatHTMLUserItem ( user, usage )
 {
-	var header = "<h3>" + user +" </h3>";
+	var icon ="<img src='graphics/user-icon-sm.png' width='20px'>";
+	var header = "<h3>" + icon + user +" </h3>";
 	var details = "<h4>Use licenses: " + usage.length + "</h4>"
 	var item = header + details;
 	return item;

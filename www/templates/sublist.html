@@ -1,25 +1,55 @@
-<ion-view title="{{productname}}">
+<ion-view title="{{headeritem.name}}">
+  <ion-nav-buttons side="left">
+    <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+  </ion-nav-buttons>
+
+  <ion-nav-buttons side="right">
+      <button class="button button-icon icon ion-refresh" ng-click="refreshListing()"></button>
+  </ion-nav-buttons>
+
 	
   <ion-content class="has-header">
 
   <ion-refresher
-      pulling-text="Pull to refresh"
-      on-refresh="refreshXMLData()">
+      pulling-text="<h6>Current collection time: {{collectiontime}}.<br/> Pull to update.</h6>"
+      on-refresh="refreshListing();"
+      refreshing-icon="none">
     </ion-refresher>
 
+    
+        
+       <!-- <ion-list>
+        <ion-item ng-repeat="item in listing" href="#/app/playlists/:Features/:{{product.id}}" class="license_info">
+          <div ng-bind-html="item.html"></div>
+          </ion-item>
+        </ion-list>
 
-    <ion-list>
-      <ion-item ng-repeat="feature in features" href="#/app/playlists/:Features/:{{product.id}}" class="license_info">
-        <h3>{{feature.name}}</h3>
-        <br/><br/>
-        <p>Licenses: {{feature.licenses}}</p>
-        <p>Used: {{feature.used}}</p>
-        <br/>
- 		<p>Version: {{feature.version}}</p>
- 		<p>Expires: {{feature.expires}}</p>
- 		
-        <div class="meterbar"><hr align="left" width="{{feature.percentage}}%" style="visibility:{{feature.bar_visibility}}"></div>
-      </ion-item>
-    </ion-list>
+        <div class="card">
+          <div class="item item-text-wrap">
+            <span ng-bind-html="headeritem.html"></span>
+          </div>
+        </div>
+
+
+      -->
+     
+      
+         <!-- <div class="license_info col" style="padding:20px">
+            <span class=""  ng-bind-html="headeritem.html"></span>
+          </div>
+        -->
+     
+
+
+      <div class="card" ng-repeat="item in listing" href="#/app/playlists/:Features/:{{product.id}}" class="">
+          <div class="item item-text-wrap license_info" >
+            <span ng-bind-html="item.html"></span>
+          </div>
+      </div>
+
+    
+  
+
+  
   </ion-content>
 </ion-view>
