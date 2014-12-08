@@ -50,7 +50,6 @@ angular.module('openit.controllers', [])
       ERROR('Failed to retrieved data');
     });
     $scope.closeLogin();
-    $location.path( 'mainlist/:products/:all' );
     $ionicViewService.clearHistory();
     // Simulate a login delay. Remove this and replace with your login
     // code if using a login system
