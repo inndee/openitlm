@@ -4,9 +4,13 @@ angular.module('openit.controllers', [])
   return { message: "I'm data from a service" };
 })
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+.controller('AppCtrl', function($scope, $ionicModal, $rootScope  , $http, $timeout , $location ) {
   // Form data for the login modal
-  $scope.loginData = {};
+
+  var loading_message = "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h3>";
+  $scope.server = {};
+  
+ 
 
   // Create the login modal that we will use later
   $ionicModal.fromTemplateUrl('templates/login.html', {
@@ -27,13 +31,32 @@ angular.module('openit.controllers', [])
 
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
+    console.log('Login in to server', $scope.server);
+    
+     var dataurl = getServerUrl();
+     $http.get( dataurl ).then(
+      function (resp)
+      {
+        VERBOSE( 'Success' , resp ); 
+        LicenseStatus = convertToJson( resp.data );
+        prepareDataListing();
+        if ( LicenseStatus.length != 0 && LicenseStatus.realtime != null )
+          $rootScope.listing = LicenseStatus.realtime.productlist;
+          $rootScope.collectiontime =  epochToDate (LicenseStatus.realtime.meta.content );
+        
+      },
 
+     function( err ) {
+      ERROR('Failed to retrieved data');
+    });
+    $scope.closeLogin();
+    $location.path( 'mainlist/:products/:all' );
+    $ionicViewService.clearHistory();
     // Simulate a login delay. Remove this and replace with your login
     // code if using a login system
-    $timeout(function() {
-      $scope.closeLogin();
-    }, 1000);
+    //$timeout(function() {
+    //  $scope.closeLogin();
+    //}, 1000);
   };
 })
 
@@ -58,23 +81,20 @@ angular.module('openit.controllers', [])
 })
 
 
-.controller('MainListCtrl', function($scope , $stateParams, $http , $ionicModal ) {
+.controller('MainListCtrl', function($scope, $rootScope , $stateParams, $http , $ionicModal ) {
    
+
+  var loading_message = "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h3>";
   /*intial load*/
-
-  // Create the login modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/login.html', {
-    scope: $scope
-  }).then(function(modal) {
-    $scope.modal = modal;
-  });
-  
-
+  $scope.defaultlimit = 25;
   $scope.category = capitaliseFirstLetter( $stateParams.category.substring(1) );
   var id = $stateParams.id.substring(1);
 
   if ( LicenseStatus.length == 0 )
   { 
+    
+    $rootScope.listing = [];
+    $rootScope.listing.push({ html: loading_message}) ;
     VERBOSE("License_status length is empty force update...");
     var dataurl = getServerUrl();
     VERBOSE("Retrieving data from " + dataurl );
@@ -85,7 +105,8 @@ angular.module('openit.controllers', [])
         LicenseStatus = convertToJson( resp.data );
         prepareDataListing();
         if ( LicenseStatus.length != 0 && LicenseStatus.realtime != null )
-          $scope.listing = prepareData();
+          $rootScope.listing = prepareData();
+        $rootScope.collectiontime =  epochToDate (LicenseStatus.realtime.meta.content );
         
       },
 
@@ -97,7 +118,7 @@ angular.module('openit.controllers', [])
 
 
     if ( LicenseStatus.length != 0 )
-     $scope.listing = prepareData();
+     $rootScope.listing = prepareData();
   
   /*Functions goes here*/
 
@@ -129,17 +150,22 @@ angular.module('openit.controllers', [])
   /*scope functions here*/
   
 
-  $scope.productListRefresh = function(){
+  $scope.refreshListing = function(){
     
     var success = false;
+    $rootScope.listing = [];
+    $rootScope.listing.push({ html: loading_message}) ;
+    $scope.search = "";
     VERBOSE("updating license status via list drag.");
     var dataurl = getServerUrl();
     VERBOSE("Retrieving data from " + dataurl );
     $http.get( dataurl ).then( function (resp) {
         VERBOSE( 'Success' , resp ); 
+        
         LicenseStatus = convertToJson( resp.data );
         if ( LicenseStatus.length != 0 )
-          $scope.listing = prepareData();
+          $rootScope.listing = prepareData();
+        $rootScope.collectiontime =  epochToDate (LicenseStatus.realtime.meta.content );
       }, function( err ) {
         showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.'); 
       }   

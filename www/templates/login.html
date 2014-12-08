@@ -1,6 +1,6 @@
 <div class="modal">
   <ion-header-bar>
-    <h1 class="title">Login</h1>
+    <h1 class="title">Set Server settings</h1>
     <div class="buttons">
       <button class="button button-clear" ng-click="closeLogin()">Close</button>
     </div>
@@ -9,12 +9,12 @@
     <form ng-submit="doLogin()">
       <div class="list">
         <label class="item item-input">
-          <span class="input-label">Username</span>
-          <input type="text" ng-model="loginData.username">
+          <span class="input-label">Server Name</span>
+          <input type="text" ng-model="server.name">
         </label>
         <label class="item item-input">
-          <span class="input-label">Password</span>
-          <input type="password" ng-model="loginData.password">
+          <span class="input-label">Port</span>
+          <input type="text" ng-model="server.port">
         </label>
         <label class="item">
           <button class="button button-block button-positive" type="submit">Log in</button>

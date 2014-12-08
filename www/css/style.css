@@ -1,3 +1,40 @@
+.spin {
+    -webkit-animation-name: rotate; 
+    -webkit-animation-duration: 1s; 
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -moz-animation-name: rotate; 
+    -moz-animation-duration: 1s; 
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: linear;
+    animation-name: rotate; 
+    animation-duration: 1s; 
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@-webkit-keyframes rotate {
+    from {-webkit-transform: rotate(0deg);}
+    to {-webkit-transform: rotate(360deg);}
+}
+
+@-moz-keyframes rotate {
+    from {-moz-transform: rotate(0deg);}
+    to {-moz-transform: rotate(360deg);}
+}
+
+@keyframes rotate {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+}
+
+
+.no-border
+{
+	border: 0px none;
+	background-image:none;
+}
+
 .menu-item
 {
 	border-color: #fff;
@@ -37,8 +74,8 @@
 	background-color: rgb(227, 227, 227);
 	border-radius: 9px;
 	height: 9px;
-	-webkit-animation: expandtag 0.5s; /* Chrome, Safari, Opera */
-	animation:expandtag 0.5s ;
+	-webkit-animation: expandtag 1s; /* Chrome, Safari, Opera */
+	animation:expandtag 1s ;
 }
 .meterbar hr
 {
