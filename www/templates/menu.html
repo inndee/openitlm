@@ -1,50 +1,48 @@
 <ion-side-menus>
 
-  <ion-side-menu-content>
-    <ion-nav-bar class="bar-calm nav-title-slide-ios7">
-      <ion-nav-back-button class="button-clear"><i class="icon ion-ios7-arrow-back"></i>  Back</ion-nav-back-button>
-    </ion-nav-bar>
-    <ion-nav-view name="menuContent" animation="slide-left-right"></ion-nav-view>
-  </ion-side-menu-content>
+    <ion-side-menu-content>
+        <ion-nav-bar class="bar-calm nav-title-slide-ios7">
+            <ion-nav-back-button class="button-clear"><i class="icon ion-ios7-arrow-back"></i> Back</ion-nav-back-button>
+        </ion-nav-bar>
+        <ion-nav-view name="menuContent" animation="slide-left-right"></ion-nav-view>
+    </ion-side-menu-content>
 
-  <ion-side-menu side="left">
+    <ion-side-menu side="left">
 
-    
-    <ion-content>
 
-      <br/><br/>
-      <img src = "graphics/logo.png" width="300px" align="center">
-      <br/></br>
+        <ion-content>
 
-      <ion-list>
-        
-        <ion-item class="menu-item" nav-clear menu-close href="#/app/mainlist/:products/:all">
-    
-              <img src="graphics/product-icon-sm.png" style="width:30px;height:30px;vertical-align:middle" >
-              Product View
-      
-        </ion-item>
+            <br/>
+            <br/>
+            <img src="graphics/logo.png" width="300px" align="center">
+            <br/></br>
 
-        <ion-item class="menu-item" nav-clear menu-close href="#/app/mainlist/:features/:all">
-          <div>
-              <img src="graphics/feature-icon-sm.png" style="width:30px;height:30px;vertical-align:middle" >
-              Feature View
-          </div>
-        </ion-item>
+            <ion-list>
 
-        <ion-item class="menu-item" nav-clear menu-close href="#/app/mainlist/:users/:all">
-          <div>
-              <img src="graphics/user-icon-sm.png" style="width:30px;height:30px;vertical-align:middle" >
-              User View
-          </div>
-        </ion-item>
-        
-        <hr/>
-        </ion-item>
-        <ion-item class="menu-item" nav-clear menu-close ng-click="login()">
-          Login to Server
-        </ion-item>
-      </ion-list>
-    </ion-content>
-  </ion-side-menu>
+                <ion-item class="menu-item" nav-clear menu-close href="#/app/mainlist/:products/:all">
+
+                    <img src="graphics/product-icon-sm.png" style="width:30px;height:30px;vertical-align:middle"> Product View
+
+                </ion-item>
+
+                <ion-item class="menu-item" nav-clear menu-close href="#/app/mainlist/:features/:all">
+                    <div>
+                        <img src="graphics/feature-icon-sm.png" style="width:30px;height:30px;vertical-align:middle"> Feature View
+                    </div>
+                </ion-item>
+
+                <ion-item class="menu-item" nav-clear menu-close href="#/app/mainlist/:users/:all">
+                    <div>
+                        <img src="graphics/user-icon-sm.png" style="width:30px;height:30px;vertical-align:middle"> User View
+                    </div>
+                </ion-item>
+
+                <hr/>
+                </ion-item>
+                <ion-item class="menu-item" nav-clear menu-close ng-click="login()">
+                    Login to Server
+                </ion-item>
+            </ion-list>
+        </ion-content>
+    </ion-side-menu>
 </ion-side-menus>
