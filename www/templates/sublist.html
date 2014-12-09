@@ -8,6 +8,21 @@
   </ion-nav-buttons>
 
 	
+  <div class="bar bar-footer no-border">
+    
+    <label class="item item-input no-border" width="60%">
+          <span class="input-label">Search:</span>
+          <input type="search"  ng-model="search.name">
+    </label>
+
+    <label class="item item-input no-border">
+          <span class="input-label">Limit:</span>
+          <input type="number" name="input" min="1" max="100" ng-model="defaultlimit" ng-maxlength="3" required>
+    </label>
+    
+  </div>
+
+
   <ion-content class="has-header">
 
   <ion-refresher
@@ -41,11 +56,15 @@
      
 
 
-      <div class="card" ng-repeat="item in listing" href="#/app/playlists/:Features/:{{product.id}}" class="">
-          <div class="item item-text-wrap license_info" >
-            <span ng-bind-html="item.html"></span>
-          </div>
-      </div>
+
+      <ion-list>
+        <a id="top"> </a>
+        <ion-item ng-repeat="item in listing | filter:search | orderBy:'name' | limitTo: defaultlimit " href="#/app/sublist/:{{category}}/:{{item.id}}" class="list-inset license_info">
+       
+        <div ng-bind-html="item.html"></div>
+          
+        </ion-item>
+      </ion-list>
 
     
   

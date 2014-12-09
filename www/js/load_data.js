@@ -1,5 +1,5 @@
-var ServerUrl = "http://devcola.com/public_data/loadxml.php";
-//var ServerUrl ="http://mnl242lin:8080/OpeniT/loadxml.ph1p";
+//var ServerUrl = "http://devcola.com/public_data/loadxml.php";
+var ServerUrl ="http://192.168.9.98:8080/loadxml.php";
 //var ServerUrl ="http://127.0.0.1:8100/loadxml.php";
 
 var LicenseStatus = [];
@@ -94,7 +94,17 @@ function prepareDataListing()
 		/*get totallicenses and inuse*/
 		getArraySubObjects( vlicense.daemons.daemon.features.feature).forEach( function (feature){
 			totallicenses += parseInt (feature.licenses);
-			totaluse += parseInt (feature.used);
+			
+			if (feature.online != null)
+			{
+				var entries = getArraySubObjects(feature.online.entry);
+				entries = getArraySubObjects( entries );
+				entries.forEach( function(entry){
+					totaluse +=  parseInt( entry.count );
+				});
+				
+			}
+				
 		});
 
 		vlicense["totallicenses"] = totallicenses;
@@ -185,7 +195,10 @@ function formatHTMLProductItem( data )
 	var details = "";
 	
 	details += "<p class='inline'>Type: " + data.type + "</p>";
-	details += "<p class='inline'>polltime: " + epochToDate(data.polltime) + "</p><br/>";
+	
+	if ( data.polltime != undefined)
+		details += "<p class='inline'>Polltime: " + epochToDate(data.polltime) + "</p><br/>";
+		
 	if (data.servers != undefined)
 		details += "<p class='inline'>Server: " + data.servers.server.name + ":" + data.servers.server.port+ "</p><br/>";
 	details += "<br/><h6 class='inline' >Total Licenses: " + data.totallicenses + "</h6>   " +
@@ -206,8 +219,14 @@ function formatHTMLFeatureItem( data )
 	var header = "<h3>" + icon + data.name +" </h3>";
 
 	var usage_meter = "";
-
-	var percentage = parseInt( (data.used/data.licenses) * 100 );
+	
+	var used = 0;
+	if ( data.online != null)
+	{
+		var online_entry = getArraySubObjects(data.online.entry);
+		used += parseInt (online_entry.length );
+	}
+	var percentage = parseInt( ( used/data.licenses ) * 100 );
 	
 	if ( percentage != 0 )
 		usage_meter = "<hr align='left' width='" + percentage + "%' />"; 
@@ -218,7 +237,7 @@ function formatHTMLFeatureItem( data )
 	details += "<p>Expires: " + epochToDate( data.expires )+ "</p>";
 	
 	details += "<h4 class='inline'>Total Licenses: " + data.licenses + "</h4>   " +
-			   "<h4 class = 'inline'>In Use Licenses: " + data.used + "</h4>";
+			   "<h4 class = 'inline'>In Use Licenses: " + used + "</h4>";
 
 	var meterbar =	"<br/><br/>" +
 					"<div class='meterbar'>" + 

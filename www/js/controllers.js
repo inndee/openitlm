@@ -82,12 +82,12 @@ angular.module('openit.controllers', [])
 })
 
 
-.controller('MainListCtrl', function($scope, $rootScope , $stateParams, $http , $ionicModal ) {
+.controller('MainListCtrl', function($scope, $rootScope , $stateParams, $http  ) {
    
 
   var loading_message = "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i><br/><br/>Updating license status</h3>";
   /*intial load*/
-  $scope.defaultlimit = 25;
+  $scope.defaultlimit = 20;
   $scope.category = capitaliseFirstLetter( $stateParams.category.substring(1) );
   var id = $stateParams.id.substring(1);
 
@@ -139,19 +139,19 @@ angular.module('openit.controllers', [])
       if ( $scope.category.toLowerCase() == 'products')
       {
          listing = LicenseStatus.realtime.productlist;
-         listing ["category"] = 'products';
+         listing ["category"] = 'product';
       }
         
       else if ( $scope.category.toLowerCase() == 'features')
       {
         listing = LicenseStatus.realtime.featureslist;
-        listing ["category"] = 'features';
+        listing ["category"] = 'feature';
       }
         
       else if ( $scope.category.toLowerCase() == 'users')
       {
         listing = LicenseStatus.realtime.userslist;
-        listing ["category"] = 'users';
+        listing ["category"] = 'user';
       }
         
       
@@ -202,7 +202,11 @@ angular.module('openit.controllers', [])
 })
 
 .controller('SubListCtrl', function($scope, $stateParams , $http ,$rootScope) {
-
+  
+  
+  $scope.defaultlimit = 20 ;
+  
+  
   var loading_message = "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h3>";
   if ( LicenseStatus.length == 0 )
   { 
@@ -244,7 +248,7 @@ angular.module('openit.controllers', [])
   {
     
     /*list down features under this product*/
-     if ( $scope.category == 'products')
+     if ( $scope.category == 'product')
      {
         var featureslist = [];
         vlicense = LicenseStatus.realtime.vendorlicenses.vendorlicense[$scope.id];
@@ -253,10 +257,18 @@ angular.module('openit.controllers', [])
           if (vlicense.name == feature.productname)
             featureslist.push(feature);    
         });
-
+        $rootScope.listing = featureslist;
+        $scope.category = 'feature';
+      
+     }
+     else if ( $scope.category == 'feature')
+     {
+        $scope.headeritem =  LicenseStatus.realtime.featureslist[ $scope.id ];
+        var users =  LicenseStatus.realtime.featureslist[ $scope.id ].online;
+        $scope.category = 'user';
      }
 
-     $rootScope.listing = featureslist;
+     
   }
 
 });

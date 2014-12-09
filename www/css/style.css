@@ -82,8 +82,7 @@
 	background-color: rgb(227, 227, 227);
 	border-radius: 9px;
 	height: 9px;
-	-webkit-animation: expandtag 1s; /* Chrome, Safari, Opera */
-	animation:expandtag 1s ;
+
 }
 .meterbar hr
 {

@@ -16,7 +16,7 @@
     </label>
 
     <label class="item item-input no-border">
-          <span class="input-label">Limit:</span>
+          <span class="input-label">Filter Name:</span>
           <input type="number" name="input" min="1" max="100" ng-model="defaultlimit" ng-maxlength="3" required>
     </label>
     
@@ -32,7 +32,7 @@
 
     <ion-list>
       <a id="top"> </a>
-      <ion-item ng-repeat="item in listing | orderBy:'name' | limitTo: defaultlimit | filter:search" href="#/app/sublist/:{{listing.category}}/:{{item.id}}" class="list-inset license_info">
+      <ion-item ng-repeat="item in listing  | filter:search | orderBy:'name' | limitTo: defaultlimit" href="#/app/sublist/:{{listing.category}}/:{{item.id}}" class="list-inset license_info">
      
       <div ng-bind-html="item.html"></div>
         
