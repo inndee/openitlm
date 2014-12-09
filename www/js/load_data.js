@@ -239,7 +239,7 @@ function formatHTMLFeatureItem(data) {
 }
 
 function formatHTMLUserItem(user, usage) {
-    var icon = "<img src='graphics/user-icon-sm.png' width='20px'>";
+    var icon = "<img src='graphics/user-icon-sm.png' width='20px'>  ";
     var header = "<h3>" + icon + user + " </h3>";
     var details = "<h4>Use licenses: " + usage.length + "</h4>"
     var item = header + details;

@@ -6,6 +6,23 @@ angular.module('openit.controllers', [])
     };
 })
 
+.factory('Configurations', function() {
+    return {
+        message: "I'm data from a service"
+    };
+})
+.factory('HtmlMessages', function() {
+    return {
+                    no_usage : "<h3 align='center'><i class='icon button-icon icon ion-information-circled'></i> <br/> <br/> Looks like there is no usage here....</h3>",
+                    warning : "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Warning</h3>",
+                    loading_message : "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h3>",
+                    custom_message : function ( type , message ){
+                        
+                    
+                 }
+    };
+})
+
 
 
 .controller('AppCtrl', function($scope, $ionicModal, $rootScope, $stateParams, $http, $timeout, $location) {
@@ -83,10 +100,10 @@ angular.module('openit.controllers', [])
 })
 
 
-.controller('MainListCtrl', function($scope, $rootScope, $stateParams, $http) {
+.controller('MainListCtrl', function($scope, $rootScope, $stateParams, $http ,HtmlMessages ) {
 
 
-    var loading_message = "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i><br/><br/>Updating license status</h3>";
+    
     /*intial load*/
     $scope.defaultlimit = 20;
     $scope.category = capitaliseFirstLetter($stateParams.category.substring(1));
@@ -96,7 +113,7 @@ angular.module('openit.controllers', [])
 
         $rootScope.listing = [];
         $rootScope.listing.push({
-            html: loading_message
+            html: HtmlMessages.loading_message
         });
         VERBOSE("License_status length is empty force update...");
         var dataurl = getServerUrl();
@@ -161,7 +178,7 @@ angular.module('openit.controllers', [])
         var success = false;
         $rootScope.listing = [];
         $rootScope.listing.push({
-            html: loading_message
+            html:  HtmlMessages.loading_message
         });
         $scope.search = "";
         VERBOSE("updating license status via list drag.");
@@ -191,17 +208,15 @@ angular.module('openit.controllers', [])
 
 })
 
-.controller('SubListCtrl', function($scope, $stateParams, $http, $rootScope) {
+.controller('SubListCtrl', function($scope, $stateParams, $http, $rootScope , HtmlMessages) {
 
 
     $scope.defaultlimit = 20;
-
-
-    var loading_message = "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h3>";
+   
     if (LicenseStatus.length == 0) {
         $rootScope.listing = [];
         $rootScope.listing.push({
-            html: loading_message
+            html: HtmlMessages.loading_message
         });
         VERBOSE("License_status length is empty force update...");
         var dataurl = getServerUrl();
@@ -249,8 +264,19 @@ angular.module('openit.controllers', [])
 
         } else if ($scope.category == 'feature') {
             $scope.headeritem = LicenseStatus.realtime.featureslist[$scope.id];
-            var users = LicenseStatus.realtime.featureslist[$scope.id].online;
+            if ( LicenseStatus.realtime.featureslist[$scope.id].online == null )
+            {
+                $rootScope.listing  = [];
+                $rootScope.listing.push( { html: HtmlMessages.no_usage } );
+            }
+                
+            else
+            {
+                 $rootScope.listing  = [];
+            }
             $scope.category = 'user';
+            LicenseStatus.realtime.userslist
+            
         }
 
 
