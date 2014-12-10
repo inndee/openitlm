@@ -1,6 +1,6 @@
 //var ServerUrl = "http://devcola.com/public_data/loadxml.php";
-//var ServerUrl = "http://192.168.9.98:8080/loadxml.php";
-var ServerUrl ="http://127.0.0.1:8100/loadxml.php";
+var ServerUrl = "http://192.168.9.98:8080/loadxml.php";
+//var ServerUrl ="http://127.0.0.1:8100/loadxml.php";
 
 var LicenseStatus = [];
 

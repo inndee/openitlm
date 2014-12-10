@@ -40,7 +40,7 @@ angular.module('openit', ['ionic', 'openit.controllers'] )
     })
 
     .state('app.browse', {
-      url: "/browse",
+      url: "/browse/:category/:id",
       views: {
         'menuContent' :{
           templateUrl: "templates/browse.html"

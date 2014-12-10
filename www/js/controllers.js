@@ -105,6 +105,7 @@ angular.module('openit.controllers', [])
 
     
     /*intial load*/
+    $scope.page = 'sublist';
     $scope.defaultlimit = 20;
     $scope.category = capitaliseFirstLetter($stateParams.category.substring(1));
     var id = $stateParams.id.substring(1);
@@ -161,7 +162,7 @@ angular.module('openit.controllers', [])
             listing["category"] = 'user';
         }
 
-
+        
         return listing;
     }
 
@@ -209,6 +210,7 @@ angular.module('openit.controllers', [])
 
 
     $scope.defaultlimit = 20;
+    
    
     if (LicenseStatus.length == 0) {
         $rootScope.listing = [];
@@ -258,10 +260,12 @@ angular.module('openit.controllers', [])
             });
             $rootScope.listing = featureslist;
             $scope.category = 'feature';
+            $scope.link = "";
 
         } else if ($scope.category == 'feature') {
+         
             $scope.headeritem = LicenseStatus.realtime.featureslist[$scope.id];
-            
+            $scope.category = 'user';
             if ( LicenseStatus.realtime.featureslist[$scope.id].online == null )
             {
                 $rootScope.listing  = [];
@@ -270,22 +274,43 @@ angular.module('openit.controllers', [])
                 
             else
             {
-
+                $rootScope.listing  = [];
                 /*create sub list of users*/
+                
                 var entries = LicenseStatus.realtime.featureslist[$scope.id].online.entry;
+                var html = [];
                 getArraySubObjects( entries ).forEach ( function (entry){
-                    var htmlitem = "<h3>" + entry.user + "</h3>"
-                    htmlitem += "<p>Host: " + entry.host + "</p><br/>";
-                    htmlitem += "<p>" + getUsageIntervals( entry.start ) + "</p><br/>";
-                    /*get how long user use the license*/
+                    var htmlitem = "<h3><img src='graphics/user-icon-sm.png' width='20px'>" + entry.user + "</h3> <br/>"
+                    htmlitem += "<p>Host: " + entry.host + "</p>";
+                    htmlitem += "<p>Count: " + ( entry.count ) + "</p><br/>";
+                    htmlitem += "<p>Running Time:</p><p>" + getUsageIntervals( entry.start ) + "</p>";
+                    $rootScope.listing.push({'html': htmlitem, id : entry.user });
                     
                    
                 });
-                 $rootScope.listing  = [];
+                
+                
+               
             }
-            $scope.category = 'user';
-            LicenseStatus.realtime.userslist
             
+            
+        }
+        
+         else if ( $scope.category == 'user')
+        {
+           
+            $scope.page = 'browse';
+            $rootScope.listing  = [];
+            var id = 0;
+            LicenseStatus.realtime.userslist.forEach( function (user)
+            {
+               if ($scope.id ==  user.name )
+               {
+                    $rootScope.listing.push( user.html );
+                   
+               }
+            });
+           
         }
 
 
