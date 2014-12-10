@@ -29,7 +29,7 @@
 
         <ion-list>
             <a id="top"> </a>
-            <ion-item ng-repeat="item in listing  | filter:search | orderBy:'name' | limitTo: defaultlimit" href="#/app/sublist/:{{listing.category}}/:{{item.id}}" class="list-inset license_info">
+            <ion-item ng-repeat="item in listing  | filter:search | orderBy:'name' | limitTo: defaultlimit"  class="list-inset license_info" href="#/app/sublist/:{{category}}/:{{item.id}}">
 
                 <div ng-bind-html="item.html"></div>
 

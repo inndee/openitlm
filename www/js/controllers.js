@@ -102,13 +102,13 @@ angular.module('openit.controllers', [])
 
 .controller('MainListCtrl', function($scope, $rootScope, $stateParams, $http ,HtmlMessages ) {
 
-
+    DEBUG('Loading MainListCtrl');
     
     /*intial load*/
     $scope.page = 'sublist';
     $scope.defaultlimit = 20;
-    $scope.category = capitaliseFirstLetter($stateParams.category.substring(1));
-    var id = $stateParams.id.substring(1);
+    $scope.category = $stateParams.category.substring(1);
+ 
 
     if (LicenseStatus.length == 0) {
 
@@ -140,35 +140,7 @@ angular.module('openit.controllers', [])
     if (LicenseStatus.length != 0)
         $rootScope.listing = prepareData();
 
-    /*Functions goes here*/
-
-
-
-    function prepareData() {
-
-        if (LicenseStatus == undefined)
-            return;
-
-        var listing = [];
-
-        if ($scope.category.toLowerCase() == 'products') {
-            listing = LicenseStatus.realtime.productlist;
-            listing["category"] = 'product';
-        } else if ($scope.category.toLowerCase() == 'features') {
-            listing = LicenseStatus.realtime.featureslist;
-            listing["category"] = 'feature';
-        } else if ($scope.category.toLowerCase() == 'users') {
-            listing = LicenseStatus.realtime.userslist;
-            listing["category"] = 'user';
-        }
-
-        
-        return listing;
-    }
-
-
-
-    /*scope functions here*/
+     /*scope functions here*/
 
 
     $scope.refreshListing = function() {
@@ -200,6 +172,35 @@ angular.module('openit.controllers', [])
         $scope.$broadcast('scroll.refreshComplete');
 
     }
+    
+    
+
+
+    function prepareData() {
+
+        if (LicenseStatus == undefined)
+            return;
+
+        var listing = [];
+        
+        if ($scope.category.toLowerCase() == 'products') {
+            listing = LicenseStatus.realtime.productlist;
+            listing["category"] = 'product';
+        } else if ($scope.category.toLowerCase() == 'features') {
+            listing = LicenseStatus.realtime.featureslist;
+            listing["category"] = 'feature';
+        } else if ($scope.category.toLowerCase() == 'users') {
+            listing = LicenseStatus.realtime.userslist;
+            listing["category"] = 'user';
+        }
+
+        
+        return listing;
+    }
+
+
+
+   
 
 
 
