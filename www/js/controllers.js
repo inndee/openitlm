@@ -145,9 +145,6 @@ angular.module('openit.controllers', [])
 
     function prepareData() {
 
-        DEBUG("Preparing data....");
-
-
         if (LicenseStatus == undefined)
             return;
 
@@ -264,6 +261,7 @@ angular.module('openit.controllers', [])
 
         } else if ($scope.category == 'feature') {
             $scope.headeritem = LicenseStatus.realtime.featureslist[$scope.id];
+            
             if ( LicenseStatus.realtime.featureslist[$scope.id].online == null )
             {
                 $rootScope.listing  = [];
@@ -272,6 +270,17 @@ angular.module('openit.controllers', [])
                 
             else
             {
+
+                /*create sub list of users*/
+                var entries = LicenseStatus.realtime.featureslist[$scope.id].online.entry;
+                getArraySubObjects( entries ).forEach ( function (entry){
+                    var htmlitem = "<h3>" + entry.user + "</h3>"
+                    htmlitem += "<p>Host: " + entry.host + "</p><br/>";
+                    htmlitem += "<p>" + getUsageIntervals( entry.start ) + "</p><br/>";
+                    /*get how long user use the license*/
+                    
+                   
+                });
                  $rootScope.listing  = [];
             }
             $scope.category = 'user';

@@ -1,10 +1,13 @@
 //var ServerUrl = "http://devcola.com/public_data/loadxml.php";
-var ServerUrl = "http://192.168.9.98:8080/loadxml.php";
-//var ServerUrl ="http://127.0.0.1:8100/loadxml.php";
+//var ServerUrl = "http://192.168.9.98:8080/loadxml.php";
+var ServerUrl ="http://127.0.0.1:8100/loadxml.php";
 
 var LicenseStatus = [];
 
-/**/
+function capitaliseFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 function getArraySubObjects(data) {
     if (data.constructor != Array) {
         var temp = [];
@@ -14,23 +17,13 @@ function getArraySubObjects(data) {
         return data;
 
 }
-
+/*works only in single arrays*/
 function removeDuplicatesInArray(array_data) {
     var uniqueArray = array_data.filter(function(elem, pos) {
         return array_data.indexOf(elem) == pos;
     });
     return uniqueArray;
 }
-
-/*-------------------Getters----------------*/
-
-function getServerUrl() {
-    /*Prevent cache*/
-    var randomNum = Math.round(Math.random() * 10000);
-    return ServerUrl + "?rand=" + randomNum;
-}
-
-/*-------------------Formatting----------------*/
 
 /*return epoch time(milliseconds) to string readable*/
 function epochToDate(epoch) {
@@ -40,10 +33,6 @@ function epochToDate(epoch) {
 
     return date.toLocaleString();
 
-}
-
-function capitaliseFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function parseXML(xml_string) {
@@ -65,6 +54,35 @@ function convertToJson(xml) {
     var json = parseXML(xml);
     return JSON.parse(xml2json(json, ''));
 }
+
+/*arguments: start time in epoch
+Converts difference in start time and current time
+returns time interval string( 1 day 2 hours...)*/
+function getUsageIntervals( start_time )
+{
+    var datetime = new Date();
+    var ctime = parseInt( datetime.getTime()) / 1000 ;
+    var diff = ctime - parseInt(start_time);
+    return parseInt(diff).timeLeft();
+}
+
+
+
+
+/*-------------------Getters----------------*/
+
+function getServerUrl() {
+    /*Prevent cache*/
+    var randomNum = Math.round(Math.random() * 10000);
+    return ServerUrl + "?rand=" + randomNum;
+}
+
+/*-------------------Formatting----------------*/
+
+
+
+
+
 
 
 
