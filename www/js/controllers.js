@@ -2,26 +2,27 @@ angular.module('openit.controllers', [])
 
 .factory('Data', function() {
     return {
-        message: "I'm data from a service"
+        defaultLimit: 20
     };
 })
 
 .factory('Configurations', function() {
     return {
-        message: "I'm data from a service"
+        message: "I'm data from a service",
+        defaultlimit: 20,
+        defaultdelay : 500,
+        server_url : getServerUrl(),
     };
 })
 .factory('HtmlMessages', function() {
     return {
-                    no_usage : "<h3 align='center'><i class='icon button-icon icon ion-information-circled'></i> <br/> <br/> Looks like there is no usage here....</h3>",
-                    warning : "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Warning</h3>",
-                    loading_message : "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h3>",
-                    custom_message : function ( type , message ){
-                        
-                    
-                 }
+        no_usage        : "<h3 align='center'><i class='icon button-icon icon ion-information-circled'></i> <br/> <br/> Looks like there is no usage here....</h3>",
+        warning         : "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Warning</h3>",
+        loading_message : "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h3>",
+        custom_message  : function ( type , message ){
+     }
     };
-})
+}) 
 
 
 
@@ -100,102 +101,94 @@ angular.module('openit.controllers', [])
 })
 
 
-.controller('MainListCtrl', function($scope, $rootScope, $stateParams, $http ,HtmlMessages ) {
+.controller('MainListCtrl', function($scope, $rootScope, $stateParams, $http , $timeout,HtmlMessages , Configurations) {
 
     DEBUG('Loading MainListCtrl');
     
-    /*intial load*/
+    /*this will be the next page*/
     $scope.page = 'sublist';
-    $scope.defaultlimit = 20;
-    $scope.category = $stateParams.category.substring(1);
- 
-
+    
+    /*initialize page*/
+    $scope.defaultlimit = Configurations.defaultlimit;
+    $scope.category_title = capitaliseFirstLetter( $stateParams.category.substring(1) );
+    $scope.category =  $stateParams.category.substring(1);
+    $scope.search = "";
+    
+    /*intial load*/
     if (LicenseStatus.length == 0) {
 
-        $rootScope.listing = [];
-        $rootScope.listing.push({
-            html: HtmlMessages.loading_message
-        });
-        VERBOSE("License_status length is empty force update...");
-        var dataurl = getServerUrl();
-        VERBOSE("Retrieving data from " + dataurl);
-        $http.get(dataurl).then(
-            function(resp) {
-                VERBOSE('Success', resp);
-                LicenseStatus = convertToJson(resp.data);
-                prepareDataListing();
-                if (LicenseStatus.length != 0 && LicenseStatus.realtime != null)
-                    $rootScope.listing = prepareData();
-                $rootScope.collectiontime = epochToDate(LicenseStatus.realtime.meta.content);
-
-            },
-
-            function(err) {
-                ERROR('Failed to retrieved data');
-                $scope.$broadcast('scroll.refreshComplete');
-            });
-    }
-
-
-    if (LicenseStatus.length != 0)
-        $rootScope.listing = prepareData();
-
-     /*scope functions here*/
-
-
-    $scope.refreshListing = function() {
-
-        var success = false;
-        $rootScope.listing = [];
-        $rootScope.listing.push({
-            html:  HtmlMessages.loading_message
-        });
-        $scope.search = "";
-        VERBOSE("updating license status via list drag.");
-        var dataurl = getServerUrl();
-        VERBOSE("Retrieving data from " + dataurl);
-        $http.get(dataurl).then(function(resp) {
+        VERBOSE("Retrieving data from " + Configurations.server_url);
+        $http.get( Configurations.server_url).then(function(resp) {
             VERBOSE('Success', resp);
-
+             $scope.message = HtmlMessages.loading_message;
+             $rootScope.listing = [];
             LicenseStatus = convertToJson(resp.data);
-            if (LicenseStatus.length != 0 && LicenseStatus.realtime != null) {
-                prepareDataListing();
-                $rootScope.listing = prepareData();
-            }
+            if (LicenseStatus.length != 0 && LicenseStatus.realtime != null) 
+                prepareData();
+
+            $timeout(function() {
+                
+                $rootScope.listing = prepareList();
+                $scope.message = "";
+            }, Configurations.defaultdelay );
 
             $rootScope.collectiontime = epochToDate(LicenseStatus.realtime.meta.content);
         }, function(err) {
             showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.');
         })
+        $scope.message = [];
+        $scope.$broadcast('scroll.refreshComplete');
+    }
+    else if (LicenseStatus.length != 0)
+        $rootScope.listing = prepareList();
+
+     /*scope functions here*/
 
 
+    $scope.refreshListing = function() {
+         
+       
+        VERBOSE("Retrieving data from " + Configurations.server_url);
+        $rootScope.listing = [];
+        
+        
+        $http.get( Configurations.server_url).then(function(resp) {
+            VERBOSE('Success', resp);
+            $scope.message = HtmlMessages.loading_message;          
+            LicenseStatus = convertToJson(resp.data);
+            if (LicenseStatus.length != 0 && LicenseStatus.realtime != null) 
+                prepareData(); 
+          
+            $timeout(function() {
+                $scope.message = "";
+                $rootScope.listing = prepareList();
+                
+                
+            }, Configurations.defaultdelay);
+
+            $rootScope.collectiontime = epochToDate(LicenseStatus.realtime.meta.content);
+        }, function(err) {
+            showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.');
+        })
+        $scope.message = [];
         $scope.$broadcast('scroll.refreshComplete');
 
     }
     
-    
-
-
-    function prepareData() {
+    function prepareList() {
 
         if (LicenseStatus == undefined)
             return;
-
-        var listing = [];
         
-        if ($scope.category.toLowerCase() == 'products') {
-            listing = LicenseStatus.realtime.productlist;
-            listing["category"] = 'product';
-        } else if ($scope.category.toLowerCase() == 'features') {
-            listing = LicenseStatus.realtime.featureslist;
-            listing["category"] = 'feature';
-        } else if ($scope.category.toLowerCase() == 'users') {
-            listing = LicenseStatus.realtime.userslist;
-            listing["category"] = 'user';
+        if ($scope.category.toLowerCase() == 'product') {
+            return  LicenseStatus.realtime.productlist;
+        } else if ($scope.category.toLowerCase() == 'feature') {
+           return LicenseStatus.realtime.featureslist;
+        } else if ($scope.category.toLowerCase() == 'user') {
+            return LicenseStatus.realtime.userslist;
         }
 
-        
-        return listing;
+        return false;
     }
 
 
@@ -207,114 +200,119 @@ angular.module('openit.controllers', [])
 
 })
 
-.controller('SubListCtrl', function($scope, $stateParams, $http, $rootScope , HtmlMessages) {
-
-
-    $scope.defaultlimit = 20;
+.controller('SubListCtrl', function($scope, $stateParams, $http, $rootScope ,$timeout , Configurations, HtmlMessages) {
     
-   
-    if (LicenseStatus.length == 0) {
-        $rootScope.listing = [];
-        $rootScope.listing.push({
-            html: HtmlMessages.loading_message
-        });
-        VERBOSE("License_status length is empty force update...");
-        var dataurl = getServerUrl();
-        VERBOSE("Retrieving data from " + dataurl);
-        $http.get(dataurl).then(
-            function(resp) {
-                VERBOSE('Success', resp);
-                LicenseStatus = convertToJson(resp.data);
-                prepareDataListing();
+    DEBUG('Loading SubListCtrl');
+    
+    /*this will be the next page*/
+ 
+    $scope.defaultlimit = Configurations.defaultlimit;
+    $scope.search = "";
+    
+    /*intial load*/
+    if (LicenseStatus.length == 0) 
+    {
+        DEBUG('LicenseStatus empty force updating...');
+        VERBOSE("Retrieving data from " + Configurations.server_url);
+        $http.get( Configurations.server_url).then(function(resp) {
+            VERBOSE('Success', resp);
+             $scope.message = HtmlMessages.loading_message;
+             $rootScope.listing = [];
+            LicenseStatus = convertToJson(resp.data);
+            if (LicenseStatus.length != 0 && LicenseStatus.realtime != null) 
                 prepareData();
-                $rootScope.collectiontime = epochToDate(LicenseStatus.realtime.meta.content);
+ 
+            $timeout(function() {
+                $scope.message = "";
+                $rootScope.listing = prepareList();
+            }, Configurations.defaultdelay );
 
-
-            },
-
-            function(err) {
-                ERROR('Failed to retrieved data');
-                $scope.$broadcast('scroll.refreshComplete');
-            });
+            $rootScope.collectiontime = epochToDate(LicenseStatus.realtime.meta.content);
+        }, function(err) {
+            showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.');
+        })
+        $scope.message = [];
+        $scope.$broadcast('scroll.refreshComplete');
     }
-
-
-    $scope.category = $stateParams.category.substring(1);
-    $scope.id = $stateParams.id.substring(1);
-    if (LicenseStatus.length != 0) {
-        prepareData();
-        $rootScope.collectiontime = epochToDate(LicenseStatus.realtime.meta.content);
-    }
-
-
-
-    function prepareData() {
-
-        /*list down features under this product*/
-        if ($scope.category == 'product') {
-            var featureslist = [];
-            vlicense = LicenseStatus.realtime.vendorlicenses.vendorlicense[$scope.id];
-            $scope.headeritem = vlicense;
-            LicenseStatus.realtime.featureslist.forEach(function(feature) {
-                if (vlicense.name == feature.productname)
-                    featureslist.push(feature);
-            });
-            $rootScope.listing = featureslist;
-            $scope.category = 'feature';
-            $scope.link = "";
-
-        } else if ($scope.category == 'feature') {
-         
-            $scope.headeritem = LicenseStatus.realtime.featureslist[$scope.id];
-            $scope.category = 'user';
-            if ( LicenseStatus.realtime.featureslist[$scope.id].online == null )
-            {
-                $rootScope.listing  = [];
-                $rootScope.listing.push( { html: HtmlMessages.no_usage } );
-            }
-                
-            else
-            {
-                $rootScope.listing  = [];
-                /*create sub list of users*/
-                
-                var entries = LicenseStatus.realtime.featureslist[$scope.id].online.entry;
-                var html = [];
-                getArraySubObjects( entries ).forEach ( function (entry){
-                    var htmlitem = "<h3><img src='graphics/user-icon-sm.png' width='20px'>" + entry.user + "</h3> <br/>"
-                    htmlitem += "<p>Host: " + entry.host + "</p>";
-                    htmlitem += "<p>Count: " + ( entry.count ) + "</p><br/>";
-                    htmlitem += "<p>Running Time:</p><p>" + getUsageIntervals( entry.start ) + "</p>";
-                    $rootScope.listing.push({'html': htmlitem, id : entry.user });
-                    
-                   
-                });
-                
-                
-               
-            }
-            
-            
-        }
+    else if (LicenseStatus.length != 0)
+        $rootScope.listing = prepareList();
         
-         else if ( $scope.category == 'user')
-        {
-           
-            $scope.page = 'browse';
-            $rootScope.listing  = [];
-            var id = 0;
-            LicenseStatus.realtime.userslist.forEach( function (user)
-            {
-               if ($scope.id ==  user.name )
-               {
-                    $rootScope.listing.push( user.html );
-                   
-               }
-            });
-           
-        }
+    $scope.refreshListing = function() {
+         
+       
+        VERBOSE("Retrieving data from " + Configurations.server_url);
+        $rootScope.listing = [];
+        
+        $http.get( Configurations.server_url).then(function(resp) {
+            VERBOSE('Success', resp);
+            $scope.message = HtmlMessages.loading_message;          
+            LicenseStatus = convertToJson(resp.data);
+            if (LicenseStatus.length != 0 && LicenseStatus.realtime != null) 
+                prepareData(); 
+ 
+            $timeout(function() {
+                $scope.message = "";
+                $rootScope.listing = prepareList();
+            }, Configurations.defaultdelay);
 
+            $rootScope.collectiontime = epochToDate(LicenseStatus.realtime.meta.content);
+        }, function(err) {
+            showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.');
+        })
+        $scope.message = [];
+        $scope.$broadcast('scroll.refreshComplete');
 
     }
+    
+    function prepareList()
+    {
+        var list =[];
+        $rootScope.listing = [];
+        if ( $stateParams.category.substring(1) == 'product')
+        {
+            var vlicense = LicenseStatus.realtime.vendorlicenses.vendorlicense[$stateParams.id.substring(1)];
+            $scope.category_title = vlicense.name;
+            
+            getArraySubObjects(vlicense.daemons.daemon.features.feature).forEach( function (feature){
+                var link = "";
+                if (feature.online != null)
+                    link = "#/app/sublist/:feature/:" +feature.id ; 
+                    
+                var htmlitem = formatHTMLFeatureItem( feature );
+                list.push( {'link' : link , 'html' : htmlitem } );
+            });
+        }
+        else if ( $stateParams.category.substring(1) == 'feature')
+        {
+            var feature = LicenseStatus.realtime.featureslist[$stateParams.id.substring(1)];
+            $scope.category_title = feature.name;
+            
+            getArraySubObjects(feature.online.entry).forEach( function (entry){
+                var link = "#/app/sublist/:user/:" + entry.user ; 
+                /*list entries*/
+                var htmlitem = "<h3><img src='graphics/user-icon-sm.png' width='20px'>" + entry.user + "</h3> <br/>"
+                htmlitem += "<p>Host: " + entry.host + "</p>";
+                htmlitem += "<p style='padding-right:10px;'>Count: " + ( entry.count ) + "</p>";
+                htmlitem += "<p>Running Time:</p><p>" + getUsageIntervals( entry.start ) + "</p>";
+                
+                list.push( {'link' : link , 'html' : htmlitem } );
+            });
+        }
+        else if ( $stateParams.category.substring(1) == 'user')
+        {
+             getArraySubObjects( LicenseStatus.realtime.userslist ).forEach( function (user) {
+                 if ( user.name == $stateParams.id.substring(1) )
+                 {
+                     getArraySubObjects( user.use ).forEach( function ( usage )
+                     {
+                         usage;
+                     });
+                     
+                 }
+             });
+        }
+        return list;
+    }
+
 
 });

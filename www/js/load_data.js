@@ -86,7 +86,7 @@ function getServerUrl() {
 
 
 
-function prepareDataListing() {
+function prepareData() {
     if (LicenseStatus.length == 0 || LicenseStatus.realtime == null) {
         ERROR('prepareDataForListing:Failed to prepare data LicenseStatus is empty');
         return false;
@@ -117,7 +117,9 @@ function prepareDataListing() {
         vlicense["totallicenses"] = totallicenses;
         vlicense["inuse"] = totaluse;
         vlicense["html"] = formatHTMLProductItem(vlicense);
-        vlicense["id"] = id++;
+        vlicense["id"] = id;
+        vlicense["link"] = "#/app/sublist/:product/:" + id;
+        id++;
         all_products.push(vlicense);
     });
 
@@ -133,8 +135,11 @@ function prepareDataListing() {
             feature["daemon_status"] = vlicense.daemons.daemon.status;
             feature["daemon_version"] = vlicense.daemons.daemon.version;
             feature["html"] = formatHTMLFeatureItem(feature);
-            feature["id"] = id++;
+            feature["id"] = id;
+            if (feature.online != null )
+                feature["link"] =  "#/app/sublist/:feature/:" + id;
             all_features.push(feature);
+            id++;
         });
 
     });

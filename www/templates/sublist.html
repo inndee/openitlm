@@ -1,4 +1,4 @@
-<ion-view title="{{headeritem.name}}">
+<ion-view title="{{category_title}}">
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
@@ -33,7 +33,7 @@
 
         <ion-list>
             <a id="top"> </a>
-            <ion-item ng-repeat="item in listing | filter:search | orderBy:'name' | limitTo: defaultlimit " class="list-inset license_info" id="listing">
+            <ion-item ng-repeat="item in listing | filter:search | orderBy:'name' | limitTo: defaultlimit " class="list-inset license_info" id="listing" href="{{item.link}}" >
 
                 <div ng-bind-html="item.html"></div>
 

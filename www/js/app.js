@@ -67,6 +67,6 @@ angular.module('openit', ['ionic', 'openit.controllers'] )
       }
     });
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/mainlist/:products/:all');
+  $urlRouterProvider.otherwise('/app/mainlist/:product/:all');
 });
 

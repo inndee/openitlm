@@ -1,3 +1,12 @@
+.centre_screen {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}
+
 .spin {
     -webkit-animation-name: rotate; 
     -webkit-animation-duration: 1s; 

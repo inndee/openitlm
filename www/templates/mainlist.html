@@ -1,4 +1,4 @@
-<ion-view title="{{category}}">
+<ion-view title="{{category_title}}">
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
@@ -21,15 +21,16 @@
         </label>
 
     </div>
+     <div ng-bind-html="message" class="centre_screen"></div>
 
     <ion-content class="has-header">
 
         <ion-refresher pulling-text="<h6>Current collection time: {{collectiontime}}.<br/> Pull to update.</h6>" on-refresh="refreshListing();" refreshing-icon="none">
         </ion-refresher>
-
+        
         <ion-list>
-            <a id="top"> </a>
-            <ion-item ng-repeat="item in listing  | filter:search | orderBy:'name' | limitTo: defaultlimit"  class="list-inset license_info" href="#/app/sublist/:{{category}}/:{{item.id}}">
+        
+            <ion-item ng-repeat="item in listing  | filter:search | orderBy:'name' | limitTo: defaultlimit"  class="list-inset license_info" href="{{item.link}}">
 
                 <div ng-bind-html="item.html"></div>
 
