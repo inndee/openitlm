@@ -116,7 +116,7 @@ angular.module('openit.controllers', [])
     
     /*intial load*/
     if (LicenseStatus.length == 0) {
-
+        $scope.message = HtmlMessages.loading_message;
         VERBOSE("Retrieving data from " + Configurations.server_url);
         $http.get( Configurations.server_url).then(function(resp) {
             VERBOSE('Success', resp);
@@ -136,7 +136,7 @@ angular.module('openit.controllers', [])
         }, function(err) {
             showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.');
         })
-        $scope.message = [];
+        
         $scope.$broadcast('scroll.refreshComplete');
     }
     else if (LicenseStatus.length != 0)
@@ -231,7 +231,7 @@ angular.module('openit.controllers', [])
         }, function(err) {
             showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.');
         })
-        $scope.message = [];
+        
         $scope.$broadcast('scroll.refreshComplete');
     }
     else if (LicenseStatus.length != 0)
@@ -279,7 +279,9 @@ angular.module('openit.controllers', [])
                     link = "#/app/sublist/:feature/:" +feature.id ; 
                     
                 var htmlitem = formatHTMLFeatureItem( feature );
-                list.push( {'link' : link , 'html' : htmlitem } );
+                feature['link'] = link;
+                feature['html'] =htmlitem;
+                list.push( feature );
             });
         }
         else if ( $stateParams.category.substring(1) == 'feature')
@@ -300,12 +302,20 @@ angular.module('openit.controllers', [])
         }
         else if ( $stateParams.category.substring(1) == 'user')
         {
-             getArraySubObjects( LicenseStatus.realtime.userslist ).forEach( function (user) {
+                $scope.category_title = $stateParams.id.substring(1);
+                getArraySubObjects( LicenseStatus.realtime.userslist ).forEach( function (user) {
                  if ( user.name == $stateParams.id.substring(1) )
                  {
                      getArraySubObjects( user.use ).forEach( function ( usage )
                      {
                          usage;
+                         var link="";
+                         var htmlitem = "<h3>Product name:" + usage.productname + "</h3>";
+                         htmlitem += "<h4>Feature name: " + usage.featurename + "</h4>";
+                         htmlitem += "<p>Count: " + usage.count + "</p>";
+                         htmlitem += "<p>Running time: " + getUsageIntervals( usage.start ) + "</p>";
+                         list.push ( {'link' : link, 'html' :htmlitem } );
+
                      });
                      
                  }

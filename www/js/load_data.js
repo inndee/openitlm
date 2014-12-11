@@ -1,5 +1,5 @@
-//var ServerUrl = "http://devcola.com/public_data/loadxml.php";
-var ServerUrl = "http://192.168.9.98:8080/loadxml.php";
+var ServerUrl = "http://devcola.com/public_data/loadxml.php";
+//var ServerUrl = "http://192.168.9.98:8080/loadxml.php";
 //var ServerUrl ="http://127.0.0.1:8100/loadxml.php";
 
 var LicenseStatus = [];
@@ -130,6 +130,16 @@ function prepareData() {
     getArraySubObjects(LicenseStatus.realtime.vendorlicenses.vendorlicense).forEach(function(vlicense) {
 
         getArraySubObjects(vlicense.daemons.daemon.features.feature).forEach(function(feature) {
+            
+            var used = 0;
+            if (feature.online != null) {
+                getArraySubObjects(feature.online.entry).forEach( function (entry){
+                    used += parseInt(entry.count);   
+                });
+
+                
+            }
+            feature["inuse"] = used;
             feature["productname"] = vlicense.name;
             feature["daemon_name"] = vlicense.daemons.daemon.name;
             feature["daemon_status"] = vlicense.daemons.daemon.status;
@@ -187,7 +197,8 @@ function prepareData() {
         users_usage.push({
             name: user,
             use: usage,
-            html: htmlitem
+            html: htmlitem,
+            link: "#/app/sublist/:user/:" + user 
         });
 
     });
@@ -214,7 +225,16 @@ function formatHTMLProductItem(data) {
         details += "<p class='inline'>Polltime: " + epochToDate(data.polltime) + "</p><br/>";
 
     if (data.servers != undefined)
-        details += "<p class='inline'>Server: " + data.servers.server.name + ":" + data.servers.server.port + "</p><br/>";
+    {
+        var master_server;
+        getArraySubObjects( data.servers.server).forEach( function(server){
+            if (server.master == 'true')
+            master_server = server;
+        });
+
+        details += "<p class='inline'>Server: " + master_server.name + ":" + master_server.port + "</p><br/>";
+    }
+       
     details += "<br/><h6 class='inline' >Total Licenses: " + data.totallicenses + "</h6>   " +
         "<h6 class='inline'>In Use Licenses: " + data.inuse + "</h6>";
 
@@ -233,12 +253,7 @@ function formatHTMLFeatureItem(data) {
 
     var usage_meter = "";
 
-    var used = 0;
-    if (data.online != null) {
-        var online_entry = getArraySubObjects(data.online.entry);
-        used += parseInt(online_entry.length);
-    }
-    var percentage = parseInt((used / data.licenses) * 100);
+    var percentage = parseInt((data.inuse / data.licenses) * 100);
 
     if (percentage != 0)
         usage_meter = "<hr align='left' width='" + percentage + "%' />";
@@ -249,7 +264,7 @@ function formatHTMLFeatureItem(data) {
     details += "<p>Expires: " + epochToDate(data.expires) + "</p>";
 
     details += "<h4 class='inline'>Total Licenses: " + data.licenses + "</h4>   " +
-        "<h4 class = 'inline'>In Use Licenses: " + used + "</h4>";
+        "<h4 class = 'inline'>In Use Licenses: " + data.inuse + "</h4>";
 
     var meterbar = "<br/><br/>" +
         "<div class='meterbar'>" +
