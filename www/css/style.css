@@ -22,6 +22,22 @@
     animation-timing-function: linear;
 }
 
+
+.green_status_icon
+{
+    font-size: 10px;
+    vertical-align: middle;
+    color: #00FF00 ;
+
+}
+.red_status_icon
+{
+    font-size: 10px;
+    vertical-align: middle;
+    color: #CC3300 ;
+}
+
+
 @-webkit-keyframes rotate {
     from {-webkit-transform: rotate(0deg);}
     to {-webkit-transform: rotate(360deg);}
@@ -96,7 +112,7 @@
 .meterbar hr
 {
 	height:9px;
-	background-color: rgb(174, 255, 0);
+	background-color: #AFE81F;
 	border-style: none;
 	border-radius: 5px;
 }

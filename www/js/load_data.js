@@ -219,7 +219,7 @@ function formatHTMLProductItem(data) {
 
     var details = "";
 
-    details += "<p class='inline'>Type: " + data.type + "</p>";
+    
 
     if (data.polltime != undefined)
         details += "<p class='inline'>Polltime: " + epochToDate(data.polltime) + "</p><br/>";
@@ -231,14 +231,21 @@ function formatHTMLProductItem(data) {
             if (server.master == 'true')
             master_server = server;
         });
+        
+        var status_circle;
+        if ( master_server.status == 'UP')
+            status_circle = "<i class ='ion-record green_status_icon'></i>";
+        else
+            status_circle = "<i class ='ion-record red_status_icon'></i>";
 
-        details += "<p class='inline'>Server: " + master_server.name + ":" + master_server.port + "</p><br/>";
+        details +=  "<br/>" + status_circle + " <p class='inline'>Type: " + data.type + "</p>"; 
+        details +=  "<p class='inline'> Server: " + master_server.name + ":" + master_server.port  + "</p><br/>";
     }
        
     details += "<br/><h6 class='inline' >Total Licenses: " + data.totallicenses + "</h6>   " +
         "<h6 class='inline'>In Use Licenses: " + data.inuse + "</h6>";
 
-    var meterbar = "<br/><br/>" +
+    var meterbar = "<br/>" +
         "<div class='meterbar'>" +
         usage_meter +
         "</div>";
@@ -259,11 +266,11 @@ function formatHTMLFeatureItem(data) {
         usage_meter = "<hr align='left' width='" + percentage + "%' />";
 
     var details = "";
-    details += "<p>Version: " + data.version + "</p></br/><br/>";
+    details += "<p>Version: " + data.version + "</p>";
     details += "<p>Product name: " + data.productname + "</p>";
-    details += "<p>Expires: " + epochToDate(data.expires) + "</p>";
+  
 
-    details += "<h4 class='inline'>Total Licenses: " + data.licenses + "</h4>   " +
+    details += "<br/></br/><h4 class='inline'>Total Licenses: " + data.licenses + "</h4>   " +
         "<h4 class = 'inline'>In Use Licenses: " + data.inuse + "</h4>";
 
     var meterbar = "<br/><br/>" +

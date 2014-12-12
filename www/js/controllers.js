@@ -295,6 +295,7 @@ angular.module('openit.controllers', [])
                 var htmlitem = "<h3><img src='graphics/user-icon-sm.png' width='20px'>" + entry.user + "</h3> <br/>"
                 htmlitem += "<p>Host: " + entry.host + "</p>";
                 htmlitem += "<p style='padding-right:10px;'>Count: " + ( entry.count ) + "</p>";
+                htmlitem += "<p style='padding-right:10px;'>Checkout time: " + epochToDate( entry.start ) + "</p>";
                 htmlitem += "<p>Running Time:</p><p>" + getUsageIntervals( entry.start ) + "</p>";
                 
                 list.push( {'link' : link , 'html' : htmlitem } );
@@ -310,9 +311,10 @@ angular.module('openit.controllers', [])
                      {
                          usage;
                          var link="";
-                         var htmlitem = "<h3>Product name:" + usage.productname + "</h3>";
+                         var htmlitem = "<h3>Product name: " + usage.productname + "</h3>";
                          htmlitem += "<h4>Feature name: " + usage.featurename + "</h4>";
                          htmlitem += "<p>Count: " + usage.count + "</p>";
+                    
                          htmlitem += "<p>Running time: " + getUsageIntervals( usage.start ) + "</p>";
                          list.push ( {'link' : link, 'html' :htmlitem } );
 
