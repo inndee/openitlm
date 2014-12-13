@@ -10,18 +10,19 @@
 
     <div class="bar bar-footer no-border">
 
-        <label class="item item-input no-border" width="60%">
+        <label class="item item-input no-border">
             <span class="input-label">Search:</span>
             <input type="search" ng-model="search.name">
         </label>
 
         <label class="item item-input no-border">
             <span class="input-label">Limit:</span>
-            <input type="number" name="input" min="1" max="900" ng-model="defaultlimit" ng-maxlength="3" required>
+            <input type="number" name="input" ng-change="validateLimit()" ng-model="defaultlimit" ng-required>
         </label>
 
     </div>
 
+    <div ng-bind-html="message" class="centre_screen"></div>
 
     <ion-content class="has-header">
 

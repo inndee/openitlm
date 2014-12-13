@@ -10,33 +10,36 @@
 
     <div class="bar bar-footer no-border">
 
-        <label class="item item-input no-border">
+        <label class="item item-input no-border" width="60%">
             <span class="input-label">Search:</span>
             <input type="search" ng-model="search.name">
         </label>
 
         <label class="item item-input no-border">
             <span class="input-label">Limit:</span>
-            <input type="number" name="input" ng-model="defaultlimit" ng-change="validateLimit()" maxlength="4">
+            <input type="number" name="input" min="1" max="900" ng-model="defaultlimit" ng-maxlength="3" required>
         </label>
 
     </div>
-     <div ng-bind-html="message" class="centre_screen"></div>
+
 
     <ion-content class="has-header">
 
         <ion-refresher pulling-text="<h6>Current collection time: {{collectiontime}}.<br/> Pull to update.</h6>" on-refresh="refreshListing();" refreshing-icon="none">
         </ion-refresher>
-        
+
+
+
+
         <ion-list>
-        
-            <ion-item ng-repeat="item in listing  | filter:search  | orderBy: 'inuse': true  | limitTo: defaultlimit"  class="list-inset license_info" href="{{item.link}}">
+            <a id="top"> </a>
+            <ion-item ng-repeat="item in listing  | filter:search  | orderBy: 'inuse': true  | limitTo: defaultlimit" class="list-inset license_info" id="listing" href="{{item.link}}" >
 
                 <div ng-bind-html="item.html"></div>
 
             </ion-item>
         </ion-list>
-        <br/>
-        <br/>
+
+
     </ion-content>
 </ion-view>

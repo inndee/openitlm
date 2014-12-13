@@ -104,7 +104,18 @@ angular.module('openit.controllers', [])
 .controller('MainListCtrl', function($scope, $rootScope, $stateParams, $http , $timeout,HtmlMessages , Configurations) {
 
     DEBUG('Loading MainListCtrl');
-    
+    $scope.validateLimit = function () {
+        console.log('tetst');
+        
+        if ( $scope.defaultlimit > 99999 )
+            $scope.defaultlimit = 20;
+
+        if ( isNaN( $scope.defaultlimit) )
+            $scope.defaultlimit = 20;
+        else if ($scope.defaultlimit  == 0 )
+            $scope.defaultlimit = 20;
+        
+    };
     /*this will be the next page*/
     $scope.page = 'sublist';
     
@@ -204,7 +215,18 @@ angular.module('openit.controllers', [])
     
     DEBUG('Loading SubListCtrl');
     
-    /*this will be the next page*/
+    $scope.validateLimit = function () {
+        console.log('tetst');
+        
+        if ( $scope.defaultlimit > 99999 )
+            $scope.defaultlimit = 20;
+
+        if ( isNaN( $scope.defaultlimit) )
+            $scope.defaultlimit = 20;
+        else if ($scope.defaultlimit  == 0 )
+            $scope.defaultlimit = 20;
+        
+    };
  
     $scope.defaultlimit = Configurations.defaultlimit;
     $scope.search = "";
@@ -298,7 +320,7 @@ angular.module('openit.controllers', [])
                 htmlitem += "<p style='padding-right:10px;'>Checkout time: " + epochToDate( entry.start ) + "</p>";
                 htmlitem += "<p>Running Time:</p><p>" + getUsageIntervals( entry.start ) + "</p>";
                 
-                list.push( {'link' : link , 'html' : htmlitem } );
+                list.push( {'name' : entry.user, 'link' : link , 'html' : htmlitem } );
             });
         }
         else if ( $stateParams.category.substring(1) == 'user')
