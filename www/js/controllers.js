@@ -338,7 +338,7 @@ angular.module('openit.controllers', [])
                          htmlitem += "<p>Count: " + usage.count + "</p>";
                     
                          htmlitem += "<p>Running time: " + getUsageIntervals( usage.start ) + "</p>";
-                         list.push ( {'link' : link, 'html' :htmlitem } );
+                         list.push ( {'name': usage.featurename ,'link' : link, 'html' :htmlitem } );
 
                      });
                      
