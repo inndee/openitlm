@@ -19,8 +19,6 @@ angular.module('openit.controllers', [])
         no_usage        : "<h3 align='center'><i class='icon button-icon icon ion-information-circled'></i> <br/> <br/> Looks like there is no usage here....</h3>",
         warning         : "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Warning</h3>",
         loading_message : "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h3>",
-        custom_message  : function ( type , message ){
-     }
     };
 }) 
 
@@ -71,12 +69,6 @@ angular.module('openit.controllers', [])
             });
         $scope.closeLogin();
 
-        //$ionicViewService.clearHistory();
-        // Simulate a login delay. Remove this and replace with your login
-        // code if using a login system
-        //$timeout(function() {
-        //  $scope.closeLogin();
-        //}, 1000);
     };
 })
 
@@ -331,14 +323,12 @@ angular.module('openit.controllers', [])
                  {
                      getArraySubObjects( user.use ).forEach( function ( usage )
                      {
-                         usage;
-                         var link="";
+                         
                          var htmlitem = "<h3>Product name: " + usage.productname + "</h3>";
                          htmlitem += "<h4>Feature name: " + usage.featurename + "</h4>";
                          htmlitem += "<p>Count: " + usage.count + "</p>";
-                    
                          htmlitem += "<p>Running time: " + getUsageIntervals( usage.start ) + "</p>";
-                         list.push ( {'name': usage.featurename ,'link' : link, 'html' :htmlitem } );
+                         list.push ( {'name': usage.featurename ,'link' : '', 'html' :htmlitem } );
 
                      });
                      
