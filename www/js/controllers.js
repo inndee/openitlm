@@ -119,12 +119,11 @@ angular.module('openit.controllers', [])
     
     /*intial load*/
     if (LicenseStatus.length == 0) {
-        $scope.message = HtmlMessages.loading_message;
+       
         VERBOSE("Retrieving data from " + Configurations.server_url);
+        $scope.message = HtmlMessages.loading_message;  
         $http.get( Configurations.server_url).then(function(resp) {
             VERBOSE('Success', resp);
-             $scope.message = HtmlMessages.loading_message;
-             $rootScope.listing = [];
             LicenseStatus = convertToJson(resp.data);
             if (LicenseStatus.length != 0 && LicenseStatus.realtime != null) 
                 prepareData();
@@ -148,16 +147,20 @@ angular.module('openit.controllers', [])
      /*scope functions here*/
 
 
-    $scope.refreshListing = function() {
+    $scope.refreshListing = function( eventtype ) {
          
        
         VERBOSE("Retrieving data from " + Configurations.server_url);
-        $rootScope.listing = [];
-        
-        
+        if ( eventtype ='manual_refresh')
+            $scope.message = HtmlMessages.loading_message;
         $http.get( Configurations.server_url).then(function(resp) {
             VERBOSE('Success', resp);
-            $scope.message = HtmlMessages.loading_message;          
+            if ( eventtype ='manual_refresh')
+            {
+                 $rootScope.listing = [];
+                $scope.message = "";
+            }
+                $scope.message = HtmlMessages.loading_message;
             LicenseStatus = convertToJson(resp.data);
             if (LicenseStatus.length != 0 && LicenseStatus.realtime != null) 
                 prepareData(); 
@@ -165,8 +168,6 @@ angular.module('openit.controllers', [])
             $timeout(function() {
                 $scope.message = "";
                 $rootScope.listing = prepareList();
-                
-                
             }, Configurations.defaultdelay);
 
             $rootScope.collectiontime = epochToDate(LicenseStatus.realtime.meta.content);
@@ -245,25 +246,29 @@ angular.module('openit.controllers', [])
         }, function(err) {
             showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.');
         })
-        
+        $scope.message = [];
         $scope.$broadcast('scroll.refreshComplete');
     }
     else if (LicenseStatus.length != 0)
         $rootScope.listing = prepareList();
         
-    $scope.refreshListing = function() {
+    $scope.refreshListing = function( eventtype ) {
          
-       
         VERBOSE("Retrieving data from " + Configurations.server_url);
-        $rootScope.listing = [];
-        
+        if ( eventtype ='manual_refresh')
+            $scope.message = HtmlMessages.loading_message;
         $http.get( Configurations.server_url).then(function(resp) {
             VERBOSE('Success', resp);
-            $scope.message = HtmlMessages.loading_message;          
+            if ( eventtype ='manual_refresh')
+            {
+                $rootScope.listing = [];
+                $scope.message = "";
+            }
+                $scope.message = HtmlMessages.loading_message;
             LicenseStatus = convertToJson(resp.data);
             if (LicenseStatus.length != 0 && LicenseStatus.realtime != null) 
                 prepareData(); 
- 
+          
             $timeout(function() {
                 $scope.message = "";
                 $rootScope.listing = prepareList();
@@ -275,7 +280,6 @@ angular.module('openit.controllers', [])
         })
         $scope.message = [];
         $scope.$broadcast('scroll.refreshComplete');
-
     }
     
     function prepareList()

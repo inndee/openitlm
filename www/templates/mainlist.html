@@ -2,38 +2,29 @@
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
-
     <ion-nav-buttons side="right">
-        <button class="button button-icon icon ion-refresh" ng-click="refreshListing()"></button>
+        <button class="button button-icon icon ion-refresh" ng-click="refreshListing('manual_refresh')"></button>
     </ion-nav-buttons>
-
-
     <div class="bar bar-footer no-border">
-
         <label class="item item-input no-border">
             <span class="input-label">Search:</span>
             <input type="search" ng-model="search.name">
         </label>
-
         <label class="item item-input no-border">
             <span class="input-label">Limit:</span>
             <input type="number" name="input" ng-model="defaultlimit" ng-change="validateLimit()" maxlength="4">
         </label>
-
     </div>
-     <div ng-bind-html="message" class="centre_screen"></div>
-
+    <div ng-bind-html="message" class="centre_screen"></div>
     <ion-content class="has-header">
-
-        <ion-refresher pulling-text="<h6>Current collection time: {{collectiontime}}.<br/> Pull to update.</h6>" on-refresh="refreshListing();" refreshing-icon="none">
+        <ion-refresher pulling-text="
+                    <p>collection time: {{collectiontime}}<br/>
+                        Pull to update.
+                    </p>" on-refresh="refreshListing();">
         </ion-refresher>
-        
         <ion-list>
-        
-            <ion-item ng-repeat="item in listing  | filter:search  | orderBy: 'inuse': true  | limitTo: defaultlimit"  class="list-inset license_info" href="{{item.link}}">
-
+            <ion-item ng-repeat="item in listing  | filter:search  | orderBy: 'inuse': true  | limitTo: defaultlimit" class="list-inset license_info" href="{{item.link}}">
                 <div ng-bind-html="item.html"></div>
-
             </ion-item>
         </ion-list>
         <br/>

@@ -4,7 +4,7 @@
     </ion-nav-buttons>
 
     <ion-nav-buttons side="right">
-        <button class="button button-icon icon ion-refresh" ng-click="refreshListing()"></button>
+        <button class="button button-icon icon ion-refresh" ng-click="refreshListing('manual_refresh')"></button>
     </ion-nav-buttons>
 
 
@@ -26,7 +26,7 @@
 
     <ion-content class="has-header">
 
-        <ion-refresher pulling-text="<h6>Current collection time: {{collectiontime}}.<br/> Pull to update.</h6>" on-refresh="refreshListing();" refreshing-icon="none">
+        <ion-refresher pulling-text="<h6>Current collection time: {{collectiontime}}.<br/> Pull to update.</h6>" on-refresh="refreshListing();" >
         </ion-refresher>
 
 
