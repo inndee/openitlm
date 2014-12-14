@@ -16,9 +16,10 @@ angular.module('openit.controllers', [])
 })
 .factory('HtmlMessages', function() {
     return {
-        no_usage        : "<h3 align='center'><i class='icon button-icon icon ion-information-circled'></i> <br/> <br/> Looks like there is no usage here....</h3>",
-        warning         : "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Warning</h3>",
-        loading_message : "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h3>",
+        no_usage        : "<h4 align='center'><i class='icon button-icon icon ion-information-circled'></i> <br/> <br/> Looks like there is no usage here....</h4>",
+        warning         : "<h4 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Warning</h4>",
+        loading_message : "<h4 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h4>",
+        no_connection   : "<h4 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Failed to get LicenseStatus</h4>",
     };
 }) 
 
@@ -100,12 +101,12 @@ angular.module('openit.controllers', [])
         console.log('tetst');
         
         if ( $scope.defaultlimit > 99999 )
-            $scope.defaultlimit = 20;
+            $scope.defaultlimit = Configurations.defaultlimit;
 
         if ( isNaN( $scope.defaultlimit) )
-            $scope.defaultlimit = 20;
+            $scope.defaultlimit = Configurations.defaultlimit;
         else if ($scope.defaultlimit  == 0 )
-            $scope.defaultlimit = 20;
+            $scope.defaultlimit = Configurations.defaultlimit;
         
     };
     /*this will be the next page*/
@@ -137,6 +138,7 @@ angular.module('openit.controllers', [])
             $rootScope.collectiontime = epochToDate(LicenseStatus.realtime.meta.content);
         }, function(err) {
             showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.');
+            $scope.message = HtmlMessages.no_connection;  
         })
         
         $scope.$broadcast('scroll.refreshComplete');
@@ -157,7 +159,7 @@ angular.module('openit.controllers', [])
             VERBOSE('Success', resp);
             if ( eventtype ='manual_refresh')
             {
-                 $rootScope.listing = [];
+                $rootScope.listing = [];
                 $scope.message = "";
             }
                 $scope.message = HtmlMessages.loading_message;
@@ -173,6 +175,7 @@ angular.module('openit.controllers', [])
             $rootScope.collectiontime = epochToDate(LicenseStatus.realtime.meta.content);
         }, function(err) {
             showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.');
+            $scope.message = HtmlMessages.no_connection;  
         })
         $scope.message = [];
         $scope.$broadcast('scroll.refreshComplete');
@@ -212,12 +215,12 @@ angular.module('openit.controllers', [])
         console.log('tetst');
         
         if ( $scope.defaultlimit > 99999 )
-            $scope.defaultlimit = 20;
+            $scope.defaultlimit = Configurations.defaultlimit;
 
         if ( isNaN( $scope.defaultlimit) )
-            $scope.defaultlimit = 20;
+            $scope.defaultlimit = Configurations.defaultlimit;
         else if ($scope.defaultlimit  == 0 )
-            $scope.defaultlimit = 20;
+            $scope.defaultlimit = Configurations.defaultlimit;
         
     };
  
