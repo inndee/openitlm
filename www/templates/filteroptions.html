@@ -4,29 +4,28 @@
     </ion-nav-buttons>
 
     <ion-nav-buttons side="right">
-        <button class="button button-icon icon ion-refresh" ng-click="refreshListing('manual_refresh')"></button>
+        <button class="button button-icon icon ion-refresh" ng-click="refreshListing()"></button>
     </ion-nav-buttons>
 
 
     <div class="bar bar-footer no-border">
 
-        <label class="item item-input no-border">
+        <label class="item item-input no-border" width="60%">
             <span class="input-label">Search:</span>
             <input type="search" ng-model="search.name">
         </label>
 
         <label class="item item-input no-border">
             <span class="input-label">Limit:</span>
-            <input type="number" name="input" ng-change="validateLimit()" ng-model="defaultlimit" ng-required>
+            <input type="number" name="input" min="1" max="900" ng-model="defaultlimit" ng-maxlength="3" required>
         </label>
 
     </div>
 
-    <div ng-bind-html="message" class="centre_screen"></div>
 
     <ion-content class="has-header">
 
-        <ion-refresher pulling-text="<h6>Current collection time: {{collectiontime}}.<br/> Pull to update.</h6>" on-refresh="refreshListing();" >
+        <ion-refresher pulling-text="<h6>Current collection time: {{collectiontime}}.<br/> Pull to update.</h6>" on-refresh="refreshListing();" refreshing-icon="none">
         </ion-refresher>
 
 

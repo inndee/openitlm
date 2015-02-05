@@ -16,11 +16,10 @@ angular.module('openit.controllers', [])
 })
 .factory('HtmlMessages', function() {
     return {
-        no_usage        : "<h3 align='center'><i class='icon button-icon icon ion-information-circled'></i> <br/> <br/> Looks like there is no usage here....</h3>",
-        warning         : "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Warning</h3>",
-        loading_message : "<h3 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h3>",
-        custom_message  : function ( type , message ){
-     }
+        no_usage        : "<h4 align='center'><i class='icon button-icon icon ion-information-circled'></i> <br/> <br/> Looks like there is no usage here....</h4>",
+        warning         : "<h4 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Warning</h4>",
+        loading_message : "<h4 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Updating license status</h4>",
+        no_connection   : "<h4 align='center'><i class='icon button-icon icon ion-load-c spin'></i></i>Failed to get LicenseStatus</h4>",
     };
 }) 
 
@@ -71,12 +70,6 @@ angular.module('openit.controllers', [])
             });
         $scope.closeLogin();
 
-        //$ionicViewService.clearHistory();
-        // Simulate a login delay. Remove this and replace with your login
-        // code if using a login system
-        //$timeout(function() {
-        //  $scope.closeLogin();
-        //}, 1000);
     };
 })
 
@@ -104,7 +97,18 @@ angular.module('openit.controllers', [])
 .controller('MainListCtrl', function($scope, $rootScope, $stateParams, $http , $timeout,HtmlMessages , Configurations) {
 
     DEBUG('Loading MainListCtrl');
-    
+    $scope.validateLimit = function () {
+        console.log('tetst');
+        
+        if ( $scope.defaultlimit > 99999 )
+            $scope.defaultlimit = Configurations.defaultlimit;
+
+        if ( isNaN( $scope.defaultlimit) )
+            $scope.defaultlimit = Configurations.defaultlimit;
+        else if ($scope.defaultlimit  == 0 )
+            $scope.defaultlimit = Configurations.defaultlimit;
+        
+    };
     /*this will be the next page*/
     $scope.page = 'sublist';
     
@@ -116,12 +120,11 @@ angular.module('openit.controllers', [])
     
     /*intial load*/
     if (LicenseStatus.length == 0) {
-        $scope.message = HtmlMessages.loading_message;
+       
         VERBOSE("Retrieving data from " + Configurations.server_url);
+        $scope.message = HtmlMessages.loading_message;  
         $http.get( Configurations.server_url).then(function(resp) {
             VERBOSE('Success', resp);
-             $scope.message = HtmlMessages.loading_message;
-             $rootScope.listing = [];
             LicenseStatus = convertToJson(resp.data);
             if (LicenseStatus.length != 0 && LicenseStatus.realtime != null) 
                 prepareData();
@@ -135,6 +138,7 @@ angular.module('openit.controllers', [])
             $rootScope.collectiontime = epochToDate(LicenseStatus.realtime.meta.content);
         }, function(err) {
             showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.');
+            $scope.message = HtmlMessages.no_connection;  
         })
         
         $scope.$broadcast('scroll.refreshComplete');
@@ -145,16 +149,20 @@ angular.module('openit.controllers', [])
      /*scope functions here*/
 
 
-    $scope.refreshListing = function() {
+    $scope.refreshListing = function( eventtype ) {
          
        
         VERBOSE("Retrieving data from " + Configurations.server_url);
-        $rootScope.listing = [];
-        
-        
+        if ( eventtype ='manual_refresh')
+            $scope.message = HtmlMessages.loading_message;
         $http.get( Configurations.server_url).then(function(resp) {
             VERBOSE('Success', resp);
-            $scope.message = HtmlMessages.loading_message;          
+            if ( eventtype ='manual_refresh')
+            {
+                $rootScope.listing = [];
+                $scope.message = "";
+            }
+                $scope.message = HtmlMessages.loading_message;
             LicenseStatus = convertToJson(resp.data);
             if (LicenseStatus.length != 0 && LicenseStatus.realtime != null) 
                 prepareData(); 
@@ -162,13 +170,12 @@ angular.module('openit.controllers', [])
             $timeout(function() {
                 $scope.message = "";
                 $rootScope.listing = prepareList();
-                
-                
             }, Configurations.defaultdelay);
 
             $rootScope.collectiontime = epochToDate(LicenseStatus.realtime.meta.content);
         }, function(err) {
             showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.');
+            $scope.message = HtmlMessages.no_connection;  
         })
         $scope.message = [];
         $scope.$broadcast('scroll.refreshComplete');
@@ -204,7 +211,18 @@ angular.module('openit.controllers', [])
     
     DEBUG('Loading SubListCtrl');
     
-    /*this will be the next page*/
+    $scope.validateLimit = function () {
+        console.log('tetst');
+        
+        if ( $scope.defaultlimit > 99999 )
+            $scope.defaultlimit = Configurations.defaultlimit;
+
+        if ( isNaN( $scope.defaultlimit) )
+            $scope.defaultlimit = Configurations.defaultlimit;
+        else if ($scope.defaultlimit  == 0 )
+            $scope.defaultlimit = Configurations.defaultlimit;
+        
+    };
  
     $scope.defaultlimit = Configurations.defaultlimit;
     $scope.search = "";
@@ -231,25 +249,29 @@ angular.module('openit.controllers', [])
         }, function(err) {
             showError('Connection error', 'Failed to retrieve license status data. Please check your server configurations or mobile data settings.');
         })
-        
+        $scope.message = [];
         $scope.$broadcast('scroll.refreshComplete');
     }
     else if (LicenseStatus.length != 0)
         $rootScope.listing = prepareList();
         
-    $scope.refreshListing = function() {
+    $scope.refreshListing = function( eventtype ) {
          
-       
         VERBOSE("Retrieving data from " + Configurations.server_url);
-        $rootScope.listing = [];
-        
+        if ( eventtype ='manual_refresh')
+            $scope.message = HtmlMessages.loading_message;
         $http.get( Configurations.server_url).then(function(resp) {
             VERBOSE('Success', resp);
-            $scope.message = HtmlMessages.loading_message;          
+            if ( eventtype ='manual_refresh')
+            {
+                $rootScope.listing = [];
+                $scope.message = "";
+            }
+                $scope.message = HtmlMessages.loading_message;
             LicenseStatus = convertToJson(resp.data);
             if (LicenseStatus.length != 0 && LicenseStatus.realtime != null) 
                 prepareData(); 
- 
+          
             $timeout(function() {
                 $scope.message = "";
                 $rootScope.listing = prepareList();
@@ -261,7 +283,6 @@ angular.module('openit.controllers', [])
         })
         $scope.message = [];
         $scope.$broadcast('scroll.refreshComplete');
-
     }
     
     function prepareList()
@@ -298,7 +319,7 @@ angular.module('openit.controllers', [])
                 htmlitem += "<p style='padding-right:10px;'>Checkout time: " + epochToDate( entry.start ) + "</p>";
                 htmlitem += "<p>Running Time:</p><p>" + getUsageIntervals( entry.start ) + "</p>";
                 
-                list.push( {'link' : link , 'html' : htmlitem } );
+                list.push( {'name' : entry.user, 'link' : link , 'html' : htmlitem } );
             });
         }
         else if ( $stateParams.category.substring(1) == 'user')
@@ -309,14 +330,12 @@ angular.module('openit.controllers', [])
                  {
                      getArraySubObjects( user.use ).forEach( function ( usage )
                      {
-                         usage;
-                         var link="";
+                         
                          var htmlitem = "<h3>Product name: " + usage.productname + "</h3>";
                          htmlitem += "<h4>Feature name: " + usage.featurename + "</h4>";
                          htmlitem += "<p>Count: " + usage.count + "</p>";
-                    
                          htmlitem += "<p>Running time: " + getUsageIntervals( usage.start ) + "</p>";
-                         list.push ( {'link' : link, 'html' :htmlitem } );
+                         list.push ( {'name': usage.featurename ,'link' : '', 'html' :htmlitem } );
 
                      });
                      

@@ -1,13 +1,23 @@
 <div class="modal">
   <ion-header-bar>
-    <h1 class="title">Set Server settings</h1>
+    <h1 class="title">Settings</h1>
     <div class="buttons">
-      <button class="button button-calm" ng-click="closeLogin()">Close</button>
+      <button class="button button-calm" ng-click="closeModal()">Close</button>
     </div>
   </ion-header-bar>
   <ion-content>
     <form ng-submit="doLogin()">
       <div class="list">
+
+        <label class="item item-radio calm">
+             <div class="item item-divider">
+              <i class="icon ion-ios-list-outline"></i> 
+              Server Settings
+            </div>
+
+           
+          </label>
+
         <label class="item item-input">
           <span class="input-label">Server Name</span>
           <input type="text" ng-model="server.name">
@@ -16,8 +26,67 @@
           <span class="input-label">Port</span>
           <input type="text" ng-model="server.port">
         </label>
+
+          <label class="item item-radio calm">
+             <div class="item item-divider">
+               <i class="icon ion-ios-list-outline"></i> 
+                Sort
+            </div>
+          </label>
+
+          <label class="item item-radio">
+            <input type="radio" ng-model="sortAsc" value = "name">
+            <div class="item-content">
+              Ascending
+            </div>
+            <i class="radio-icon ion-checkmark"></i>
+          </label>
+
+          <label class="item item-radio">
+            <input type="radio" ng-model="sortDec"  ng-checked="true">
+            <div class="item-content">
+              Descending
+            </div>
+            <i class="radio-icon ion-checkmark"></i>
+          </label>
+
+
+          <label class="item item-radio calm">
+             <div class="item item-divider">
+               <i class="icon ion-ios-list-outline"></i> 
+              Sort by
+            </div>
+          </label>
+
+          <label class="item item-radio">
+            <input type="radio"  ng-model="sortbyName"  ng-checked="true">
+            <div class="item-content">
+              Name
+            </div>
+            <i class="radio-icon ion-checkmark"></i>
+          </label>
+
+          <label class="item item-radio">
+            <input type="radio" ng-model="sortbyUtilization" value="utilization">
+            <div class="item-content">
+              Utilization
+            </div>
+            <i class="radio-icon ion-checkmark"></i>
+          </label>
+
+          <label class="item item-radio">
+            <input type="radio" ng-model="sortbyUsed" value ="used">
+            <div class="item-content">
+              Used
+            </div>
+            <i class="radio-icon ion-checkmark"></i>
+          </label>
+
+        
+
+
         <label class="item">
-          <button class="button button-block button-calm" type="submit">Log in</button>
+          <button class="button button-block button-calm" type="submit">Save</button>
         </label>
       </div>
     </form>

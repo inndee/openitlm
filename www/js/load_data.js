@@ -238,14 +238,14 @@ function formatHTMLProductItem(data) {
         else
             status_circle = "<i class ='ion-record red_status_icon'></i>";
 
-        details +=  "<br/>" + status_circle + " <p class='inline'>Type: " + data.type + "</p>"; 
+        details += status_circle + " <p class='inline'>Type: " + data.type + "</p>"; 
         details +=  "<p class='inline'> Server: " + master_server.name + ":" + master_server.port  + "</p><br/>";
     }
        
     details += "<br/><h6 class='inline' >Total Licenses: " + data.totallicenses + "</h6>   " +
         "<h6 class='inline'>In Use Licenses: " + data.inuse + "</h6>";
 
-    var meterbar = "<br/>" +
+    var meterbar = "<br/><br/>" +
         "<div class='meterbar'>" +
         usage_meter +
         "</div>";
